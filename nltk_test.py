@@ -321,6 +321,3 @@ print '============================================'
 
 print unicodedata.normalize('NFKD', u'abcd\xe9').encode('ascii', 'ignore') == b'abcde'
 print UnicodeDammit(u'abcd\xe9').unicode_markup == u'abcdé'
-
-
-
