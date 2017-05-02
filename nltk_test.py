@@ -46,7 +46,6 @@ print(words.fileids())
 print(len(words.words('en')))
 print(len(words.words('en-basic')))
 
-
 # 8_1
 def not_stopwords(text):
     en_stopwords = stopwords.words('english')
