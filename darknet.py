@@ -14,7 +14,7 @@ class Darknet(object):
     def __init__(self, config_filename, clean=True):
         self.clean = clean
         self.config = {}
-        self.model_subdirs = ['backup', 'JPEGImages', 'results', 'labels', 'temp_train', 'temp_valid']
+        self.model_subdirs = ['backup', 'images', 'results', 'labels', 'temp_train', 'temp_valid', 'temp_test']
         self.target_path = None
         self.backup_dir = None
         self.valid_res_dir = None
@@ -22,11 +22,13 @@ class Darknet(object):
         self.labels_dir = None
         self.temp_train_dir = None
         self.temp_valid_dir = None
+        self.temp_test_dir = None
         self.labels_filename = None
         self.classes_filename = None
-        self.darknet_train_filename = None
-        self.darknet_valid_filename = None
-        self.darknet_data_filename = None
+        self.train_filename = None
+        self.valid_filename = None
+        self.test_filename = None
+        self.data_filename = None
         self.aliases_filename = None
         self.aliases = {}
         self.classes = None
@@ -64,7 +66,7 @@ class Darknet(object):
                 self.backup_dir = subdir
             elif model_subdir == 'results':
                 self.valid_res_dir = subdir
-            elif model_subdir == 'JPEGImages':
+            elif model_subdir == 'images':
                 self.images_dir = subdir
             elif model_subdir == 'labels':
                 self.labels_dir = subdir
@@ -72,12 +74,15 @@ class Darknet(object):
                 self.temp_train_dir = subdir
             elif model_subdir == 'temp_valid':
                 self.temp_valid_dir = subdir
+            elif model_subdir == 'temp_test':
+                self.temp_test_dir = subdir
 
         self.classes_filename = os.path.join(self.target_path, 'diddles.names')
         self.labels_filename = os.path.join(self.target_path, 'diddles.labels')
-        self.darknet_train_filename = os.path.join(self.target_path, 'diddles.train.list')
-        self.darknet_valid_filename = os.path.join(self.target_path, 'diddles.valid.list')
-        self.darknet_data_filename = os.path.join(self.target_path, 'diddles.data')
+        self.train_filename = os.path.join(self.target_path, 'diddles.train.list')
+        self.valid_filename = os.path.join(self.target_path, 'diddles.valid.list')
+        self.test_filename = os.path.join(self.target_path, 'diddles.test.list')
+        self.data_filename = os.path.join(self.target_path, 'diddles.data')
 
     def load_classes(self):
         classes_filename = os.path.join(self.config['source_path'], self.config['model_name'] + '.names')
@@ -125,10 +130,11 @@ class Darknet(object):
                 for i in range(self.n_classes):
                     ofs.write('%s\n' % str(i))
 
-            with open(self.darknet_data_filename, 'w') as ofs:
+            with open(self.data_filename, 'w') as ofs:
                 ofs.write('classes = %s\n' % self.n_classes)
-                ofs.write('train = %s\n' % self.darknet_train_filename)
-                ofs.write('valid = %s\n' % self.darknet_valid_filename)
+                ofs.write('train = %s\n' % self.train_filename)
+                ofs.write('valid = %s\n' % self.valid_filename)
+                ofs.write('test = %s\n' % self.test_filename)
                 ofs.write('backup = %s\n' % self.backup_dir)
                 ofs.write('results = %s\n' % self.valid_res_dir)
                 ofs.write('labels = %s\n' % self.labels_filename)
@@ -157,6 +163,60 @@ class Darknet(object):
             else:
                 raise
 
+    def create_cross_validation_datasets(self):
+        # Make cross-validation data files.
+        import os
+        import numpy as np
+
+        img_files = []
+        for f in os.listdir(self.temp_train_dir):
+            with open(os.path.join(self.temp_train_dir, f)) as ifs:
+                files = ifs.read().strip().split('\n')
+            img_files += files
+
+        np.random.shuffle(img_files)
+
+        n_splits = 5
+        n_split = 1
+        n_files = len(img_files)
+        n_test = n_files / n_splits
+        i_files = n_test
+        test_dict = {i+1: [] for i in range(n_splits)}
+        for ii, img_file in enumerate(img_files):
+            if ii >= i_files:
+                n_split += 1
+                i_files += n_test
+            test_dict[n_split].append(img_file)
+
+        test_files = []
+        for n_split, image_list in test_dict.iteritems():
+            test_file = 'test' + str(n_split) + '.list'
+            with open(os.path.join(self.target_path, test_file), 'w') as ofs:
+                for image_file in image_list:
+                    ofs.write(image_file + '\n')
+            test_files.append(test_file)
+
+        for test_file in test_files:
+            train_files = []
+            for train_file in test_files:
+                if train_file == test_file:
+                    continue
+                train_files.append(os.path.join(self.target_path, train_file))
+
+            if len(train_files) == 0:
+                break
+
+            command = ['cat'] + train_files
+            p = Popen(command, stdout=PIPE, stderr=PIPE)
+            stdout, stderr = p.communicate()
+            if len(stderr) != 0:
+                print stderr
+                break
+
+            train_filename = test_file.replace('test', 'trainval')
+            with open(os.path.join(self.target_path, train_filename), 'w') as ofs:
+                ofs.write(stdout)
+
     def merge_datasets(self):
         temp_train_files = [os.path.join(self.temp_train_dir, f) for f in os.listdir(self.temp_train_dir)]
         if len(temp_train_files) == 0:
@@ -167,7 +227,7 @@ class Darknet(object):
         if len(stderr) != 0:
             print stderr
             return
-        with open(self.darknet_train_filename, 'w') as ofs:
+        with open(self.train_filename, 'w') as ofs:
             ofs.write(stdout)
 
         temp_valid_files = [os.path.join(self.temp_valid_dir, f) for f in os.listdir(self.temp_valid_dir)]
@@ -179,7 +239,19 @@ class Darknet(object):
         if len(stderr) != 0:
             print stderr
             return
-        with open(self.darknet_valid_filename, 'w') as ofs:
+        with open(self.valid_filename, 'w') as ofs:
+            ofs.write(stdout)
+
+        temp_test_files = [os.path.join(self.temp_test_dir, f) for f in os.listdir(self.temp_test_dir)]
+        if len(temp_test_files) == 0:
+            return
+        command = ['cat'] + temp_test_files
+        p = Popen(command, stdout=PIPE, stderr=PIPE)
+        stdout, stderr = p.communicate()
+        if len(stderr) != 0:
+            print stderr
+            return
+        with open(self.test_filename, 'w') as ofs:
             ofs.write(stdout)
 
     def create_synset_labels_dict(self):
@@ -286,11 +358,8 @@ class Darknet(object):
 if __name__ == '__main__':
 
     extra_labels_file = '/home/maddoxw/PycharmProjects/diddles/data/imagenet_name_synsets.txt'
-    darknet = Darknet('/home/maddoxw/PycharmProjects/diddles/data/yolo_diddles.config')
-
-    # extra_labels_file = '/home/maddoxw/PycharmProjects/diddles/data/imagenet_name_synsets.txt'
+    darknet = Darknet('/home/maddoxw/PycharmProjects/diddles/data/yolo_fgvc_family.config')
     # darknet = Darknet('/home/maddoxw/PycharmProjects/diddles/data/yolo_diddles.config')
-
     # darknet = Darknet('/home/maddoxw/PycharmProjects/diddles/data/coco', clean=False)
 
     # darknet.create_synset_labels_dict()
@@ -313,8 +382,7 @@ if __name__ == '__main__':
 
     for ds in darknet.datasets:
         if ds == 'Imagenet':
-            # imagenet = Imagenet(darknet, extra_labels_file)
-            imagenet = Imagenet(darknet)
+            imagenet = Imagenet(darknet, extra_labels_file)
             imagenet.create_darknet_dataset()
         elif ds == 'Pascal':
             pascal = Pascal(darknet)
@@ -330,6 +398,7 @@ if __name__ == '__main__':
             pixabay.create_darknet_dataset()
         print ds, 'complete'
 
-    darknet.merge_datasets()
+    darknet.create_cross_validation_datasets()
+    # darknet.merge_datasets()
 
     print 'done'
