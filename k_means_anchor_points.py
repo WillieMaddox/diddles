@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
-import time
+import os
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import xml.etree.ElementTree as ET
 from pycocotools.coco import COCO
-from utils import convert_bbox, convert_coco_bbox
+from utils import convert_bbox, convert_coco_bbox, BoundingBox
 import IO
 
 # Original code @ferada http://codereview.stackexchange.com/questions/128315/k-means-clustering-algorithm-implementation
@@ -103,6 +103,36 @@ def plot_anchors(pascal_anchors, coco_anchors):
     plt.show()
 
 
+def load_fgvc_dataset():
+    name = 'fgvc-aircraft-2013b'
+    data = []
+    bboxes = {}
+    sizes = {}
+
+    source_dir = os.path.join(IO.data_source_dir, 'FGVC', name, 'data')
+    source_imgdir = os.path.join(source_dir, 'images')
+
+    with open(source_imgdir + '_box.txt') as ifs:
+        lines = ifs.read().strip().split('\n')
+        for line in lines:
+            image_id, bbox = line.split(' ', 1)
+            bboxes[image_id] = map(int, bbox.split())
+
+    with open(source_imgdir + '_size.txt') as ifs:
+        lines = ifs.read().strip().split('\n')
+        for line in lines:
+            image_id, size = line.split(' ', 1)
+            sizes[image_id] = map(int, size.split())
+
+    for key in bboxes.iterkeys():
+        size = sizes[key]
+        bbox = bboxes[key]
+        bb = BoundingBox(size, bbox, 'fgvc').convert_to('darknet')
+        data.append(bb[2:])
+
+    return np.array(data)
+
+
 def load_pascal_dataset():
     name = 'pascal'
     data = []
@@ -184,24 +214,29 @@ if __name__ == "__main__":
     img_size = 416
     k = 5
 
-    random_data = np.random.random((1000, 2))
-    centroids = np.random.random((k, 2))
-    random_anchors = kmeans_iou(k, centroids, random_data)
+    # random_data = np.random.random((1000, 2))
+    # centroids = np.random.random((k, 2))
+    # random_anchors = kmeans_iou(k, centroids, random_data)
 
     source_dir = IO.data_source_dir
 
-    datasets = (('2007', 'train'), ('2007', 'val'), ('2012', 'train'), ('2012', 'val'))
-    pascal_data = load_pascal_dataset()
-    centroids = pascal_data[np.random.choice(np.arange(len(pascal_data)), k, replace=False)]
-    # centroids = pascal_data[:k]
-    pascal_anchors = kmeans_iou(k, centroids, pascal_data, feature_size=img_size / 32)
+    datasets = ('train', 'val', 'test')
+    fgvc_data = load_fgvc_dataset()
+    centroids = fgvc_data[np.random.choice(np.arange(len(fgvc_data)), k, replace=False)]
+    fgvc_anchors = kmeans_iou(k, centroids, fgvc_data, feature_size=img_size / 32)
 
-    datasets = ('train2014', 'val2014')
-    # datasets = ('test2014', 'test2015')
-    coco_data = load_coco_dataset()
-    centroids = coco_data[np.random.choice(np.arange(len(coco_data)), k, replace=False)]
-    # centroids = coco_data[:k]
-    coco_anchors = kmeans_iou(k, centroids, coco_data, feature_size=img_size / 32)
+    # datasets = (('2007', 'train'), ('2007', 'val'), ('2012', 'train'), ('2012', 'val'))
+    # pascal_data = load_pascal_dataset()
+    # centroids = pascal_data[np.random.choice(np.arange(len(pascal_data)), k, replace=False)]
+    # # centroids = pascal_data[:k]
+    # pascal_anchors = kmeans_iou(k, centroids, pascal_data, feature_size=img_size / 32)
+
+    # datasets = ('train2014', 'val2014')
+    # # datasets = ('test2014', 'test2015')
+    # coco_data = load_coco_dataset()
+    # centroids = coco_data[np.random.choice(np.arange(len(coco_data)), k, replace=False)]
+    # # centroids = coco_data[:k]
+    # coco_anchors = kmeans_iou(k, centroids, coco_data, feature_size=img_size / 32)
 
     # reshape: [[x1,y1,w1,h1],...,[xn,yn,wn,hn]]
     # pascal_anchors = np.hstack((np.zeros((k, 2)), pascal_anchors * img_size))
