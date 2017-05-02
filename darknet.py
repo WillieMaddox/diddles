@@ -285,8 +285,8 @@ class Darknet(object):
 
 if __name__ == '__main__':
 
-    extra_labels_file = '/home/maddoxw/PycharmProjects/to_darknet/data/imagenet_name_synsets.txt'
-    darknet = Darknet('/home/maddoxw/PycharmProjects/to_darknet/data/yolo_diddles.config')
+    extra_labels_file = '/home/maddoxw/PycharmProjects/diddles/data/imagenet_name_synsets.txt'
+    darknet = Darknet('/home/maddoxw/PycharmProjects/diddles/data/yolo_diddles.config')
 
     # extra_labels_file = '/home/maddoxw/PycharmProjects/diddles/data/imagenet_name_synsets.txt'
     # darknet = Darknet('/home/maddoxw/PycharmProjects/diddles/data/yolo_diddles.config')
