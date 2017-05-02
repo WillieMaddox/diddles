@@ -1,0 +1,27 @@
+screwdriver	flat tip screwdriver,Phillips screwdriver
+person	individual,human
+shoe	running shoe
+tie	Windsor tie,necktie
+wallet	billfold
+eyeglasses	spectacles,sunglasses
+handbag	purse
+book	textbook
+chair	folding chair,rocking chair,swivel chair
+bottle	water bottle,water_bottle
+cell phone	cellular telephone,cellular phone,cell,mobile phone
+monitor	tv or monitor,tvmonitor,tv monitor,computer monitor,tv_or_monitor
+computer	desktop computer,computing machine
+laptop	laptop computer
+keyboard	computer keyboard,computer_keyboard
+mouse	computer mouse,computer_mouse
+flash drive	flash memory,thumb drive,usb drive
+car	automobile,vehicle
+truck	motortruck
+van	minivan,moving van,police van
+airplane	aeroplane,plane,airliner
+jet	military jet,fighter jet,jet plane
+drone	radio-controlled aircraft
+tank	army tank
+gun	handgun,pistol,rifle,assault rifle,revolver
+dog	canine
+table	desk,dining table,conference table,coffee table
