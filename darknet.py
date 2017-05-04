@@ -174,16 +174,17 @@ class Darknet(object):
         # Make cross-validation data files.
         import numpy as np
 
+        n_splits = 5
+
         img_files = []
         for f in os.listdir(self.temp_train_dir):
             with open(os.path.join(self.temp_train_dir, f)) as ifs:
                 files = ifs.read().strip().split('\n')
             img_files += files
+        np.random.shuffle(img_files)
         n_files = len(img_files)
 
         img_cls_arr = np.zeros((n_files, self.n_classes))
-        classes_dict = {i: [] for i in range(self.n_classes)}
-        # this might not work for coco since coco uses 1-indexing.
         for ii, img_file in enumerate(img_files):
             txt_file = img_file.replace('JPEGImages', 'labels')
             txt_file = txt_file.replace('images', 'labels')
@@ -196,24 +197,21 @@ class Darknet(object):
                 jj = int(line.split(' ', 1)[0])
                 img_cls_arr[ii, jj] += 1
 
+        classes_dict = {i: [] for i in range(self.n_classes)}
+        # this might not work for coco since coco uses 1-indexing.
         for ii in range(n_files):
             if np.sum(img_cls_arr[ii]) == 1:
                 cls = np.where(img_cls_arr[ii] == 1)[0][0]
                 classes_dict[cls].append(ii)
             else:
+                # TODO: allow multiple bboxes per image.
                 raise
 
-        n_splits = 5
         test_dict = {i + 1: [] for i in range(n_splits)}
-
         for cls_img_files in classes_dict.itervalues():
-
-            np.random.shuffle(cls_img_files)
-
             n_test = len(cls_img_files) / n_splits
             i_files = n_test
             n_split = 1
-
             for ii, img_file in enumerate(cls_img_files):
                 if ii >= i_files:
                     n_split += 1
