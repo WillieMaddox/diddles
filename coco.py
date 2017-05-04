@@ -1,6 +1,6 @@
 import os
 from pycocotools.coco import COCO
-from utils import convert_coco_bbox, print_class_counts
+from utils import convert_coco_bbox, print_class_counts, BoundingBox
 import IO
 
 
@@ -10,8 +10,8 @@ class Coco(object):
     """
     def __init__(self, darknet):
         self.darknet = darknet
-        self.source_dir = IO.data_source_dir
         self.name = 'coco'
+        self.source_dir = os.path.join(IO.data_source_dir, self.name)
         self.datasets = ('train2014', 'val2014')
         self.coco = None
         self.classes = None
@@ -42,10 +42,7 @@ class Coco(object):
         self.class_counts = {label: 0 for label in classes.keys()}
         return classes
 
-    def convert_annotation(self, datatype, image_id, image_meta):
-
-        label_file = image_meta['file_name'].replace('jpg', 'txt')
-        label_filename = os.path.join(self.darknet.labels_dir, self.name, datatype, label_file)
+    def convert_annotation(self, out_filename, image_id, image_meta):
 
         annIds = self.coco.getAnnIds(imgIds=image_id)
         anns = self.coco.loadAnns(annIds)
@@ -59,15 +56,17 @@ class Coco(object):
         if len(class_bboxes) == 0:
             return False
 
-        if not os.path.exists(label_filename.rpartition(os.sep)[0]):
-            os.makedirs(label_filename.rpartition(os.sep)[0])
+        # label_file = image_meta['file_name'].replace('jpg', 'txt')
+        # label_filename = os.path.join(self.darknet.labels_dir, self.name, dataset, label_file)
+        if not os.path.exists(out_filename.rpartition(os.sep)[0]):
+            os.makedirs(out_filename.rpartition(os.sep)[0])
 
-        out_file = open(label_filename, 'w')
+        out_file = open(out_filename, 'w')
 
         for cls, b in class_bboxes:
-            cls_id = self.classes[cls]
-            bb = convert_coco_bbox((image_meta['width'], image_meta['height']), b)
-            out_file.write(str(cls_id) + " " + " ".join([str(a) for a in bb]) + '\n')
+            # bb = convert_coco_bbox((image_meta['width'], image_meta['height']), b)
+            bb = BoundingBox((image_meta['width'], image_meta['height']), b, 'coco').convert_to('darknet')
+            out_file.write(str(self.classes[cls]) + " " + " ".join(map(str, bb)) + '\n')
             self.class_counts[cls] += 1
 
         out_file.close()
@@ -78,7 +77,7 @@ class Coco(object):
 
         for dataset in self.datasets:
 
-            annfile = '%s/%s/annotations/instances_%s.json' % (self.source_dir, self.name, dataset)
+            annfile = os.path.join(self.source_dir, 'annotations', 'instances_' + dataset + '.json')
             self.coco = COCO(annfile)
             self.classes = self.load_classes()
             img_id_set = set()
@@ -87,19 +86,23 @@ class Coco(object):
                 img_ids = self.coco.getImgIds(catIds=cat_ids)
                 img_id_set = img_id_set.union(set(img_ids))
             self.img_ids = list(img_id_set)
+            print '# of images to process:', len(self.img_ids)
 
-            source_imgdir = os.path.join(self.source_dir, self.name, dataset)
+            source_imgdir = os.path.join(self.source_dir, dataset)
+            target_imgdir = os.path.join(self.darknet.images_dir, self.name, dataset)
+            target_lbldir = os.path.join(self.darknet.labels_dir, self.name, dataset)
             list_file = open('%s/%s_%s.list' % (self.darknet.temp_train_dir, self.name, dataset), 'w')
-            print 'n_images to process:', len(self.img_ids)
             for image_id in self.img_ids:
-                img = self.coco.loadImgs(image_id)[0]
 
+                img = self.coco.loadImgs(image_id)[0]
                 src_img_filename = os.path.join(source_imgdir, img['file_name'])
                 if not os.path.exists(src_img_filename):
                     continue  # no image file
 
-                if self.convert_annotation(dataset, image_id, img):
-                    lnk_image_filename = src_img_filename.replace(self.source_dir, self.darknet.images_dir)
+                label_file = img['file_name'].replace('jpg', 'txt')
+                tgt_lbl_filename = os.path.join(target_lbldir, label_file)
+                if self.convert_annotation(tgt_lbl_filename, image_id, img):
+                    lnk_image_filename = os.path.join(target_imgdir, img['file_name'])
                     if not os.path.exists(lnk_image_filename.rpartition(os.sep)[0]):
                         os.makedirs(lnk_image_filename.rpartition(os.sep)[0])
                     os.symlink(src_img_filename, lnk_image_filename)

@@ -115,6 +115,7 @@ class Darknet(object):
             self.aliases[cls] = cls
 
     def build_model_directory(self):
+        classes_filename = os.path.join(self.config['source_path'], self.config['model_name'] + '.names')
         for model_subdir in self.model_subdirs:
             subdir = os.path.join(self.target_path, model_subdir)
             if os.path.exists(subdir) and self.clean:
@@ -123,24 +124,30 @@ class Darknet(object):
                 os.makedirs(subdir)
 
         if self.clean:
-            classes_filename = os.path.join(self.config['source_path'], self.config['model_name'] + '.names')
-            shutil.copyfile(classes_filename, self.classes_filename)
+            if os.path.exists(self.classes_filename):
+                os.remove(self.classes_filename)
+            if os.path.exists(self.labels_filename):
+                os.remove(self.labels_filename)
+            if os.path.exists(self.data_filename):
+                os.remove(self.data_filename)
 
-            with open(self.labels_filename, 'w') as ofs:
-                for i in range(self.n_classes):
-                    ofs.write('%s\n' % str(i))
+        shutil.copyfile(classes_filename, self.classes_filename)
 
-            with open(self.data_filename, 'w') as ofs:
-                ofs.write('classes = %s\n' % self.n_classes)
-                ofs.write('train = %s\n' % self.train_filename)
-                ofs.write('valid = %s\n' % self.valid_filename)
-                ofs.write('test = %s\n' % self.test_filename)
-                ofs.write('backup = %s\n' % self.backup_dir)
-                ofs.write('results = %s\n' % self.valid_res_dir)
-                ofs.write('labels = %s\n' % self.labels_filename)
-                ofs.write('names = %s\n' % self.classes_filename)
-                ofs.write('top = 5\n')
-                ofs.write('eval = coco\n')
+        with open(self.labels_filename, 'w') as ofs:
+            for i in range(self.n_classes):
+                ofs.write('%s\n' % str(i))
+
+        with open(self.data_filename, 'w') as ofs:
+            ofs.write('classes = %s\n' % self.n_classes)
+            ofs.write('train = %s\n' % self.train_filename)
+            ofs.write('valid = %s\n' % self.valid_filename)
+            ofs.write('test = %s\n' % self.test_filename)
+            ofs.write('backup = %s\n' % self.backup_dir)
+            ofs.write('results = %s\n' % self.valid_res_dir)
+            ofs.write('labels = %s\n' % self.labels_filename)
+            ofs.write('names = %s\n' % self.classes_filename)
+            ofs.write('top = 5\n')
+            ofs.write('eval = coco\n')
 
     def create_dataset_list(self):
         self.datasets = []
@@ -165,7 +172,6 @@ class Darknet(object):
 
     def create_cross_validation_datasets(self):
         # Make cross-validation data files.
-        import os
         import numpy as np
 
         img_files = []
@@ -173,27 +179,54 @@ class Darknet(object):
             with open(os.path.join(self.temp_train_dir, f)) as ifs:
                 files = ifs.read().strip().split('\n')
             img_files += files
+        n_files = len(img_files)
 
-        np.random.shuffle(img_files)
+        img_cls_arr = np.zeros((n_files, self.n_classes))
+        classes_dict = {i: [] for i in range(self.n_classes)}
+        # this might not work for coco since coco uses 1-indexing.
+        for ii, img_file in enumerate(img_files):
+            txt_file = img_file.replace('JPEGImages', 'labels')
+            txt_file = txt_file.replace('images', 'labels')
+            txt_file = txt_file.replace('.JPEG', '.txt')
+            txt_file = txt_file.replace('.jpg', '.txt')
+            txt_file = txt_file.replace('.png', '.txt')
+            with open(txt_file) as ifs:
+                lines = ifs.read().strip().split('\n')
+            for line in lines:
+                jj = int(line.split(' ', 1)[0])
+                img_cls_arr[ii, jj] += 1
+
+        for ii in range(n_files):
+            if np.sum(img_cls_arr[ii]) == 1:
+                cls = np.where(img_cls_arr[ii] == 1)[0][0]
+                classes_dict[cls].append(ii)
+            else:
+                raise
 
         n_splits = 5
-        n_split = 1
-        n_files = len(img_files)
-        n_test = n_files / n_splits
-        i_files = n_test
-        test_dict = {i+1: [] for i in range(n_splits)}
-        for ii, img_file in enumerate(img_files):
-            if ii >= i_files:
-                n_split += 1
-                i_files += n_test
-            test_dict[n_split].append(img_file)
+        test_dict = {i + 1: [] for i in range(n_splits)}
+
+        for cls_img_files in classes_dict.itervalues():
+
+            np.random.shuffle(cls_img_files)
+
+            n_test = len(cls_img_files) / n_splits
+            i_files = n_test
+            n_split = 1
+
+            for ii, img_file in enumerate(cls_img_files):
+                if ii >= i_files:
+                    n_split += 1
+                    i_files += n_test
+                test_dict[n_split].append(img_file)
 
         test_files = []
         for n_split, image_list in test_dict.iteritems():
+            np.random.shuffle(image_list)
             test_file = 'test' + str(n_split) + '.list'
             with open(os.path.join(self.target_path, test_file), 'w') as ofs:
-                for image_file in image_list:
-                    ofs.write(image_file + '\n')
+                for idx in image_list:
+                    ofs.write(img_files[idx] + '\n')
             test_files.append(test_file)
 
         for test_file in test_files:
@@ -358,7 +391,7 @@ class Darknet(object):
 if __name__ == '__main__':
 
     extra_labels_file = '/home/maddoxw/PycharmProjects/diddles/data/imagenet_name_synsets.txt'
-    darknet = Darknet('/home/maddoxw/PycharmProjects/diddles/data/yolo_fgvc_family.config')
+    darknet = Darknet('/home/maddoxw/PycharmProjects/diddles/data/yolo_fgvc_family_balanced.config', clean=False)
     # darknet = Darknet('/home/maddoxw/PycharmProjects/diddles/data/yolo_diddles.config')
     # darknet = Darknet('/home/maddoxw/PycharmProjects/diddles/data/coco', clean=False)
 

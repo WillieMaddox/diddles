@@ -9,8 +9,8 @@ except ImportError:
     import pickle as pickle
 import utils
 
-data_source_dir = "/media/Borg_LS/DATA"
-# data_source_dir = "/media/RED6/DATA"
+# data_source_dir = "/media/Borg_LS/DATA"
+data_source_dir = "/media/RED6/DATA"
 imagenet_source_dir = os.path.join(data_source_dir, "imagenet")
 wordnet_source_dir = os.path.join(data_source_dir, "nltk_data", "corpora", "wordnet")
 pixabay_source_dir = os.path.join(data_source_dir, "pixabay")
