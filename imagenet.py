@@ -2,7 +2,7 @@ import re
 import os
 import xml.etree.ElementTree as ET
 import IO
-from utils import convert_bbox, print_class_counts
+from utils import convert_bbox, print_class_counts, BoundingBox
 
 
 class Imagenet(object):
@@ -36,9 +36,8 @@ class Imagenet(object):
     def __init__(self, darknet, extra_aliases_file=None):
         self.darknet = darknet
         self.extra_aliases_file = extra_aliases_file
-        self.datadir = os.path.join(IO.data_source_dir, 'imagenet')
         self.name = 'ILSVRC'
-        self.source_dir = os.path.join(self.datadir, self.name)
+        self.source_dir = os.path.join(IO.data_source_dir, 'imagenet', self.name)
         self.source_anodir = os.path.join(self.source_dir, 'Annotations')
         self.source_imgdir = os.path.join(self.source_dir, 'Data')
         self.source_setsdir = os.path.join(self.source_dir, 'ImageSets')
@@ -65,7 +64,6 @@ class Imagenet(object):
         #     'CLS-LOC': {'train': ('_cls',)},
         #     'DET': {'train': ('',)},
         # }
-
         # self.sets = {
         #     'CLS-LOC': {'train': ('_cls', '_loc'), 'val': ('',)},
         #     'DET': {'train': ('',), 'val': ('',)},
@@ -81,8 +79,8 @@ class Imagenet(object):
         # self.shortnames_file = os.path.join(self.darknet.config['source_path'], 'imagenet.shortnames.list')
         # self.synset_names_dict = self.gen_synset_names_dict()
 
-        # self.synset_words_file = os.path.join(self.datadir, self.name, 'synset_words.txt')
-        # self.synset_is_a_file = os.path.join(self.datadir, self.name, 'wordnet.is_a.txt')
+        # self.synset_words_file = os.path.join(IO.imagenet_source_dir, 'synset_words.txt')
+        # self.synset_is_a_file = os.path.join(IO.imagenet_source_dir, 'wordnet.is_a.txt')
         # self.wordnet_list = self.gen_wordnet_list()
 
     def load_classes(self):
@@ -183,9 +181,9 @@ class Imagenet(object):
 
         out_file = open(out_filename, 'w')
         for cls, b in class_bboxes:
-            cls_id = classes_map[cls]
-            bb = convert_bbox((w, h), b)
-            out_file.write(str(cls_id) + " " + " ".join([str(a) for a in bb]) + '\n')
+            # bb = convert_bbox((w, h), b)
+            bb = BoundingBox((w, h), b, 'voc').convert_to('darknet')
+            out_file.write(str(classes_map[cls]) + " " + " ".join(map(str, bb)) + '\n')
             self.class_counts[comp][cls] += 1
 
         in_file.close()

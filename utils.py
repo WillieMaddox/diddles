@@ -71,22 +71,22 @@ class BBoxDim(object):
     def update(self):
         if self.n_inputs != 2:
             return
-        if self._min and self._max:
+        if self._min is not None and self._max is not None:
             self._cen = (self._max + self._min) / 2
             self._thick = self._max - self._min
-        elif self._min and self._cen:
+        elif self._min is not None and self._cen is not None:
             self._max = 2 * self._cen - self._min
             self._thick = 2 * (self._cen - self._min)
-        elif self._min and self._thick:
+        elif self._min is not None and self._thick is not None:
             self._max = self._min + self._thick
             self._cen = self._min + self._thick / 2
-        elif self._max and self._cen:
+        elif self._max is not None and self._cen is not None:
             self._min = 2 * self._cen - self._max
             self._thick = 2 * (self._max - self._cen)
-        elif self._max and self._thick:
+        elif self._max is not None and self._thick is not None:
             self._min = self._max - self._thick
             self._cen = self._max - self._thick / 2
-        elif self._cen and self._thick:
+        elif self._cen is not None and self._thick is not None:
             self._min = self._cen - self._thick / 2
             self._max = self._cen + self._thick / 2
         self.n_inputs = 4
@@ -241,6 +241,10 @@ def convert_bbox(size, box):
     y = y * dh
     h = h * dh
     return x, y, w, h
+
+
+def get_yolo_filters(classes, coords, num):
+    return (classes + coords + 1) * num
 
 
 def print_class_counts(name, class_counts, skip_zeros=False, mapper=None):

@@ -18,8 +18,8 @@ class Pixabay(object):
 
     def __init__(self, darknet):
         self.darknet = darknet
-        self.source_dir = IO.data_source_dir
         self.name = 'pixabay'
+        self.source_dir = IO.data_source_dir
         self.datadir = os.path.join(self.source_dir, self.name)
         self.ano_dir = os.path.join(self.datadir, 'Annotations')
         self.img_dir = os.path.join(self.datadir, 'JPEGImages')
@@ -327,9 +327,8 @@ class Pixabay(object):
 
         out_file = open(out_filename, 'w')
         for cls, b in class_bboxes:
-            cls_id = classes_map[cls]
             bb = convert_bbox((w, h), b)
-            out_file.write(str(cls_id) + " " + " ".join([str(a) for a in bb]) + '\n')
+            out_file.write(str(classes_map[cls]) + " " + " ".join(map(str, bb)) + '\n')
             self.class_counts[cls] += 1
 
         in_file.close()
@@ -338,18 +337,20 @@ class Pixabay(object):
 
     def create_darknet_dataset(self):
 
+        target_imgdir = os.path.join(self.darknet.images_dir, self.name)
         list_file = open('%s/%s.list' % (self.darknet.temp_train_dir, self.name), 'w')
 
         for dirpath, _, xml_filenames in os.walk(self.ano_dir):
             for xml_fname in xml_filenames:
                 image_id = os.path.splitext(xml_fname)[0]
-                src_img_filename = '%s/%s.jpg' % (self.img_dir, image_id)
+                img_file = image_id + '.jpg'
+                src_img_filename = os.path.join(self.img_dir, img_file)
                 if not os.path.exists(src_img_filename):
                     print image_id, 'image is missing.'
                     continue  # no image file
 
                 if self.convert_annotation(image_id, self.classes):
-                    lnk_image_filename = src_img_filename.replace(self.source_dir, self.darknet.data_dir)
+                    lnk_image_filename = os.path.join(target_imgdir, img_file)
                     if not os.path.exists(lnk_image_filename.rpartition(os.sep)[0]):
                         os.makedirs(lnk_image_filename.rpartition(os.sep)[0])
                     os.symlink(src_img_filename, lnk_image_filename)

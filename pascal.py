@@ -1,4 +1,5 @@
 import os
+import time
 import xml.etree.ElementTree as ET
 from utils import convert_bbox, print_class_counts, BoundingBox
 import IO
@@ -10,8 +11,8 @@ class Pascal(object):
     """
     def __init__(self, darknet):
         self.darknet = darknet
-        self.source_dir = IO.data_source_dir
         self.name = 'pascal'
+        self.source_dir = os.path.join(IO.data_source_dir, self.name, 'VOCdevkit')
         # self.sets = [('2012', 'train'), ('2007', 'train')]
         self.sets = [('2012', 'train'), ('2012', 'val'), ('2007', 'train'), ('2007', 'val')]
         self.base_classes = ["aeroplane", "bicycle", "bird", "boat", "bottle", "bus", "car", "cat", "chair", "cow", "diningtable", "dog", "horse", "motorbike", "person", "pottedplant", "sheep", "sofa", "train", "tvmonitor"]
@@ -33,9 +34,7 @@ class Pascal(object):
         self.class_counts = {label: 0 for label in classes.keys()}
         return classes
 
-    def convert_annotation(self, year, image_id, classes_map):
-        in_filename = '%s/%s/VOCdevkit/VOC%s/Annotations/%s.xml' % (self.source_dir, self.name, year, image_id)
-        out_filename = '%s/%s/VOCdevkit/VOC%s/labels/%s.txt' % (self.darknet.labels_dir, self.name, year, image_id)
+    def convert_annotation(self, in_filename, out_filename, classes_map):
 
         in_file = open(in_filename)
         tree = ET.parse(in_file)
@@ -66,12 +65,9 @@ class Pascal(object):
 
         out_file = open(out_filename, 'w')
         for cls, b in class_bboxes:
-            cls_id = classes_map[cls]
-            bb = convert_bbox((w, h), b)
-            bbx = BoundingBox((w, h), b, 'voc').convert_to('darknet')
-            print bb
-            print bbx
-            out_file.write(str(cls_id) + " " + " ".join([str(a) for a in bb]) + '\n')
+            # bb = convert_bbox((w, h), b)
+            bb = BoundingBox((w, h), b, 'voc').convert_to('darknet')
+            out_file.write(str(classes_map[cls]) + " " + " ".join(map(str, bb)) + '\n')
             self.class_counts[cls] += 1
 
         in_file.close()
@@ -82,16 +78,25 @@ class Pascal(object):
     def create_darknet_dataset(self):
 
         for year, image_set in self.sets:
-            self.source_imgdir = '%s/%s/VOCdevkit/VOC%s/JPEGImages' % (self.source_dir, self.name, year)
-            image_ids = open('%s/%s/VOCdevkit/VOC%s/ImageSets/Main/%s.txt' % (self.source_dir, self.name, year, image_set)).read().strip().split()
+            year_id = 'VOC%s' % (year,)
+            source_idsdir = os.path.join(self.source_dir, year_id, 'ImageSets', 'Main')
+            source_imgdir = os.path.join(self.source_dir, year_id, 'JPEGImages')
+            source_lbldir = os.path.join(self.source_dir, year_id, 'Annotations')
+            target_imgdir = os.path.join(self.darknet.images_dir, self.name, year_id)
+            target_lbldir = os.path.join(self.darknet.labels_dir, self.name, year_id)
+            ids_filename = os.path.join(source_idsdir, image_set + '.txt')
+            image_ids = open(ids_filename).read().strip().split()
             list_file = open('%s/%s_%s%s.list' % (self.darknet.temp_train_dir, self.name, year, image_set), 'w')
+
             for image_id in image_ids:
-                src_img_filename = '%s/%s.jpg' % (self.source_imgdir, image_id)
+                src_img_filename = os.path.join(source_imgdir, image_id + '.jpg')
                 if not os.path.exists(src_img_filename):
                     continue  # no image file
+                src_lbl_filename = os.path.join(source_lbldir, image_id + '.xml')
+                tgt_lbl_filename = os.path.join(target_lbldir, image_id + '.txt')
 
-                if self.convert_annotation(year, image_id, self.classes):
-                    lnk_image_filename = src_img_filename.replace(self.source_dir, self.darknet.images_dir)
+                if self.convert_annotation(src_lbl_filename, tgt_lbl_filename, self.classes):
+                    lnk_image_filename = os.path.join(target_imgdir, image_id + '.jpg')
                     if not os.path.exists(lnk_image_filename.rpartition(os.sep)[0]):
                         os.makedirs(lnk_image_filename.rpartition(os.sep)[0])
                     os.symlink(src_img_filename, lnk_image_filename)
