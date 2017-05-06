@@ -204,6 +204,7 @@ class Darknet(object):
                 cls = np.where(img_cls_arr[ii] == 1)[0][0]
                 classes_dict[cls].append(ii)
             else:
+
                 # TODO: allow multiple bboxes per image.
                 raise
 
