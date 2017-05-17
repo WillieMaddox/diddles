@@ -2,11 +2,15 @@ import os
 import time
 import shutil
 import networkx as nx
+import numpy as np
+import matplotlib.pyplot as plt
+
 from subprocess import Popen, PIPE
 from imagenet import Imagenet
 from pascal import Pascal
 from coco import Coco
 from pixabay import Pixabay
+from bagram import Bagram
 from fgvc_aircraft import FGVC
 
 
@@ -167,6 +171,8 @@ class Darknet(object):
                 self.datasets.append('FGVC')
             elif dataset.lower() in ('pixabay',):
                 self.datasets.append('Pixabay')
+            elif dataset.lower() in ('bagram',):
+                self.datasets.append('Bagram')
             else:
                 raise
 
@@ -198,25 +204,55 @@ class Darknet(object):
                 img_cls_arr[ii, jj] += 1
 
         classes_dict = {i: [] for i in range(self.n_classes)}
-        # this might not work for coco since coco uses 1-indexing.
-        for ii in range(n_files):
-            if np.sum(img_cls_arr[ii]) == 1:
+        if len(img_cls_arr) == np.sum(img_cls_arr):  # If only one bbox per image...
+            for ii in range(n_files):
                 cls = np.where(img_cls_arr[ii] == 1)[0][0]
                 classes_dict[cls].append(ii)
-            else:
-                # TODO: allow multiple bboxes per image.
-                raise
 
-        test_dict = {i + 1: [] for i in range(n_splits)}
-        for cls_img_files in classes_dict.itervalues():
-            n_test = len(cls_img_files) / n_splits
+            test_dict = {i + 1: [] for i in range(n_splits)}
+            for cls_img_files in classes_dict.itervalues():
+                n_test = len(cls_img_files) / n_splits
+                i_files = n_test
+                n_split = 1
+                for ii, img_file in enumerate(cls_img_files):
+                    if ii >= i_files:
+                        n_split += 1
+                        i_files += n_test
+                    test_dict[n_split].append(img_file)
+
+        else:  # If multiple bboxes...
+            index_ordered = partition_classes(img_cls_arr)
+            # plot_cross_val(img_cls_arr, axes=(14, 6))
+            test_dict = {i + 1: [] for i in range(n_splits)}
+            cls_img_files = np.arange(n_files)
+            n_test = float(n_files) / n_splits
             i_files = n_test
             n_split = 1
-            for ii, img_file in enumerate(cls_img_files):
+            for ii, img_file in enumerate(cls_img_files[index_ordered]):
                 if ii >= i_files:
                     n_split += 1
                     i_files += n_test
                 test_dict[n_split].append(img_file)
+
+        # this might not work for coco since coco uses 1-indexing.
+        # for ii in range(n_files):
+        #     if np.sum(img_cls_arr[ii]) == 1:
+        #         cls = np.where(img_cls_arr[ii] == 1)[0][0]
+        #         classes_dict[cls].append(ii)
+        #     else:
+        #         # TODO: allow multiple bboxes per image.
+        #         raise
+
+        # test_dict = {i + 1: [] for i in range(n_splits)}
+        # for cls_img_files in classes_dict.itervalues():
+        #     n_test = len(cls_img_files) / n_splits
+        #     i_files = n_test
+        #     n_split = 1
+        #     for ii, img_file in enumerate(cls_img_files):
+        #         if ii >= i_files:
+        #             n_split += 1
+        #             i_files += n_test
+        #         test_dict[n_split].append(img_file)
 
         test_files = []
         for n_split, image_list in test_dict.iteritems():
@@ -386,10 +422,64 @@ class Darknet(object):
         # print time.time() - t0
 
 
+def partition_classes(arr):
+    # This works for 2 classes only.
+    n_files, n_classes = arr.shape
+    totals = np.sum(arr, axis=0)
+    dijs = totals / n_files
+
+    deviates = arr - dijs
+    pivot_vec = np.zeros((n_classes,))
+    index_remain = np.arange(n_files)
+    index_ordered = np.zeros(n_files, dtype=int)
+    for i in range(n_files):
+        norms = np.linalg.norm(pivot_vec + deviates[index_remain], axis=1)
+        k = np.argmin(norms)
+        j = index_remain[k]
+        pivot_vec += deviates[j]
+        index_ordered[i] = j
+        index_remain = np.delete(index_remain, k)
+
+    return index_ordered
+
+
+def plot_cross_val(arr, axes=(14, 6)):
+    # This works for 2 classes only.
+    n_files, n_classes = arr.shape
+    xy_arr = arr[:, [axes[0], axes[1]]]
+    totals = np.sum(xy_arr, axis=0)
+    dijs = totals / n_files
+
+    xy_deviates = xy_arr - dijs
+    pivot_vec = np.zeros((2,))
+    index_remain = np.arange(n_files)
+    index_ordered = np.zeros(n_files, dtype=int)
+    for i in range(n_files):
+        norms = np.linalg.norm(pivot_vec + xy_deviates[index_remain], axis=1)
+        k = np.argmin(norms)
+        j = index_remain[k]
+        pivot_vec += xy_deviates[j]
+        index_ordered[i] = j
+        index_remain = np.delete(index_remain, k)
+
+    xy_ordered = xy_arr[index_ordered]
+    cumsum = np.cumsum(xy_arr, axis=0)
+    cumsum_ordered = np.cumsum(xy_ordered, axis=0)
+
+    # plt.scatter(xy_deviates[:, 0], xy_deviates[:, 1], color="r", marker=".")
+    plt.scatter(cumsum[:, 0], cumsum[:, 1], color="r", marker=".")
+    plt.scatter(cumsum_ordered[:, 0], cumsum_ordered[:, 1], color="b", marker=".")
+
+    # plt.plot(cumsum[:, 0], cumsum[:, 1], color="g")
+    plt.plot([0, totals[0]], [0, totals[1]], color="g")
+    plt.show()
+
+
 if __name__ == '__main__':
 
     extra_labels_file = '/home/maddoxw/PycharmProjects/diddles/data/imagenet_name_synsets.txt'
-    darknet = Darknet('/home/maddoxw/PycharmProjects/diddles/data/yolo_fgvc_family_balanced.config', clean=False)
+    # darknet = Darknet('/home/maddoxw/PycharmProjects/diddles/data/yolo_fgvc_family.config', clean=False)
+    darknet = Darknet('/home/maddoxw/PycharmProjects/diddles/data/yolo_bagram.config', clean=False)
     # darknet = Darknet('/home/maddoxw/PycharmProjects/diddles/data/yolo_diddles.config')
     # darknet = Darknet('/home/maddoxw/PycharmProjects/diddles/data/coco', clean=False)
 
@@ -427,6 +517,9 @@ if __name__ == '__main__':
         elif ds == 'Pixabay':
             pixabay = Pixabay(darknet)
             pixabay.create_darknet_dataset()
+        elif ds == 'Bagram':
+            bagram = Bagram(darknet)
+            bagram.create_darknet_dataset()
         print ds, 'complete'
 
     darknet.create_cross_validation_datasets()
