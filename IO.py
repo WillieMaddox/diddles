@@ -1,4 +1,5 @@
 import os
+import json
 import shutil
 from operator import itemgetter
 from PIL import Image
@@ -48,14 +49,14 @@ def dump_pkl(filename, pkl_obj):
 
 
 def read_wordnet_heirarchy_file():
-    filename = imagenet_source_dir + "wordnet.is_a.txt"
+    filename = os.path.join(imagenet_source_dir, "wordnet.is_a.txt")
     graph = nx.read_edgelist(filename, create_using=nx.DiGraph())
     assert nx.is_directed_acyclic_graph(graph)
     return graph
 
 
 def read_synset_words_file():
-    filename = imagenet_source_dir + "synset_words.txt"
+    filename = os.path.join(imagenet_source_dir, "synset_words.txt")
     with open(filename) as ifs:
         lines = ifs.read().strip().split('\n')
     synset_words = [line.split('\t') for line in lines]
@@ -115,27 +116,27 @@ def read_wordnet_exc_file(part_of_speech, output=None, verbose=False):
 
 
 def read_pixabay_metadata_file():
-    meta_file = pixabay_source_dir + 'metadata.pkl'
+    meta_file = os.path.join(pixabay_source_dir, 'metadata.pkl')
     return load_pkl(meta_file)
 
 
 def write_pixabay_metadata_file(metadata):
-    meta_file = pixabay_source_dir + 'metadata.pkl'
+    meta_file = os.path.join(pixabay_source_dir, 'metadata.pkl')
     dump_pkl(meta_file, metadata)
 
 
 def read_pixabay_orphans_file():
-    meta_file = pixabay_source_dir + 'orphans.pkl'
+    meta_file = os.path.join(pixabay_source_dir, 'orphans.pkl')
     return load_pkl(meta_file)
 
 
 def write_pixabay_orphans_file(orphan_metadata):
-    meta_file = pixabay_source_dir + 'orphans.pkl'
+    meta_file = os.path.join(pixabay_source_dir, 'orphans.pkl')
     dump_pkl(meta_file, orphan_metadata)
 
 
 def read_pixabay_tally_file(hit_limit=0):
-    tally_file = pixabay_source_dir + 'tally.txt'
+    tally_file = os.path.join(pixabay_source_dir, 'tally.txt')
     with open(tally_file) as ifs:
         lines = ifs.read().strip().split('\n')
     tallies = [line.split('\t') for line in lines]
@@ -146,28 +147,39 @@ def read_pixabay_tally_file(hit_limit=0):
 
 
 def write_pixabay_tally_file(label_counts):
-    tally_file = pixabay_source_dir + 'tally.txt'
+    tally_file = os.path.join(pixabay_source_dir, 'tally.txt')
     with open(tally_file, 'w') as ofs:
         for label0, counts in sorted(label_counts.items(), key=itemgetter(1), reverse=True):
             ofs.write("{}\t{}\n".format(counts, label0))
 
 
+# def read_pixabay_aliases_file(dual=False):
+#     aliases_file = os.path.join(pixabay_source_dir, 'aliases.txt')
+#     with open(aliases_file) as ifs:
+#         lines = ifs.read().strip().split('\n')
+#     labels_aliases = [line.split('\t') for line in lines]
+#     labels, alias_strings = list(zip(*labels_aliases))
+#     alias_lists = [[w.strip() for w in ws.split(',')] for ws in alias_strings]
+#     if dual:
+#         pixabay_aliases = {alias: label for label, alias_list in zip(labels, alias_lists) for alias in alias_list}
+#     else:
+#         pixabay_aliases = {label: alias_list for label, alias_list in zip(labels, alias_lists)}
+#     return pixabay_aliases
+
+
 def read_pixabay_aliases_file(dual=False):
-    aliases_file = pixabay_source_dir + 'aliases.txt'
+    aliases_file = os.path.join(pixabay_source_dir, 'aliases.json')
     with open(aliases_file) as ifs:
-        lines = ifs.read().strip().split('\n')
-    labels_aliases = [line.split('\t') for line in lines]
-    labels, alias_strings = zip(*labels_aliases)
-    alias_lists = [[w.strip() for w in ws.split(',')] for ws in alias_strings]
+        pixabay_aliases = json.load(ifs)
     if dual:
-        pixabay_aliases = {alias: label for label, alias_list in zip(labels, alias_lists) for alias in alias_list}
-    else:
-        pixabay_aliases = {label: alias_list for label, alias_list in zip(labels, alias_lists)}
+        pixabay_aliases = {alias: label for label, alias_list in pixabay_aliases.items() for alias in alias_list}
+    # else:
+    #     pixabay_aliases = pixabay_aliases_temp
     return pixabay_aliases
 
 
 def read_pixabay_blacklist_file():
-    blacklist_file = pixabay_source_dir + 'blacklist.txt'
+    blacklist_file = os.path.join(pixabay_source_dir, 'blacklist.txt')
     with open(blacklist_file) as ifs:
         pixabay_blacklist = set(ifs.read().strip().lower().split('\n'))
     return pixabay_blacklist
@@ -182,8 +194,8 @@ def remove_orphaned_images():
             orphaned_files.append(image_file)
 
     for orphaned_file in orphaned_files:
-        source_file = pixabay_image_dir + orphaned_file
-        target_file = pixabay_orphans_dir + orphaned_file
+        source_file = os.path.join(pixabay_image_dir, orphaned_file)
+        target_file = os.path.join(pixabay_orphans_dir, orphaned_file)
         shutil.move(source_file, target_file)
 
     print('{} images orphaned'.format(len(orphaned_files)))
@@ -192,8 +204,8 @@ def remove_orphaned_images():
 
 def merge_orphaned_images():
     for orphaned_file in os.listdir(pixabay_orphans_dir):
-        source_file = pixabay_orphans_dir + orphaned_file
-        target_file = pixabay_image_dir + orphaned_file
+        source_file = os.path.join(pixabay_orphans_dir, orphaned_file)
+        target_file = os.path.join(pixabay_image_dir, orphaned_file)
         shutil.move(source_file, target_file)
 
 

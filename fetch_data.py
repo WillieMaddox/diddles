@@ -299,7 +299,7 @@ USED_LABELS = {}
 
 if __name__ == '__main__':
 
-    with open('coco_test2.names') as ifs:
+    with open('data/yolo_diddles.names') as ifs:
         labels = ifs.read().strip().split('\n')
 
     IO.merge_orphaned_metadata()
