@@ -49,7 +49,7 @@ class Pixabay(object):
         try:
             rough_string = ET.tostring(elem, 'utf8')
         except Exception:
-            print elem
+            print(elem)
         root = etree.fromstring(rough_string)
         return etree.tostring(root, pretty_print=True)
 
@@ -185,13 +185,13 @@ class Pixabay(object):
         :return:
         :rtype:
         """
-        print 'size before:', len(in_metadata)
+        print('size before:', len(in_metadata))
         out_metadata = {}
         for img_id, img_dict in in_metadata.iteritems():
             if img_dict['n_labels'] <= max_classes:
                 out_metadata[img_id] = img_dict
 
-        print 'size after:', len(out_metadata)
+        print('size after:', len(out_metadata))
         return out_metadata
 
     def unbias_dataset(self, in_metadata, cls_counts, max_classes):
@@ -290,13 +290,13 @@ class Pixabay(object):
         size = root.find('size')
         d = int(size.find('depth').text)
         if d != 3:
-            print image_id, ' is greyscale. Skipping.'
+            print(image_id, ' is greyscale. Skipping.')
             return False
 
         w = float(size.find('width').text)
         h = float(size.find('height').text)
         if w < 1 or h < 1:
-            print image_id, 'width and/or height == 0'
+            print(image_id, 'width and/or height == 0')
             return False
 
         class_bboxes = []
@@ -304,11 +304,11 @@ class Pixabay(object):
             difficult = obj.find('difficult')
             difficult = difficult.text if difficult is not None else 0
             if int(difficult) == 1:
-                print image_id, 'difficult == 1'
+                print(image_id, 'difficult == 1')
                 continue
             alias = obj.find('name').text
             if alias not in self.aliases:
-                print image_id, 'skipping label', alias
+                print(image_id, 'skipping label', alias)
                 continue
             cls = self.aliases[alias]
             xmlbox = obj.find('bndbox')
@@ -319,7 +319,7 @@ class Pixabay(object):
             class_bboxes.append((cls, b))
 
         if len(class_bboxes) == 0:
-            print image_id, 'no bounding boxes detected'
+            print(image_id, 'no bounding boxes detected')
             return False
 
         if not os.path.exists(out_filename.rpartition(os.sep)[0]):
@@ -346,7 +346,7 @@ class Pixabay(object):
                 img_file = image_id + '.jpg'
                 src_img_filename = os.path.join(self.img_dir, img_file)
                 if not os.path.exists(src_img_filename):
-                    print image_id, 'image is missing.'
+                    print(image_id, 'image is missing.')
                     continue  # no image file
 
                 if self.convert_annotation(image_id, self.classes):

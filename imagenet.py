@@ -106,7 +106,7 @@ class Imagenet(object):
                     if self.aliases[key] == 'person':
                         continue
                     comp_classes[key] = self.darknet.classes.index(self.aliases[key])
-                    print 'extra_aliases', key, self.aliases[key]
+                    print('extra_aliases', key, self.aliases[key])
                 # elif value in self.darknet.aliases.keys():
                 #     comp_classes[key] = self.darknet.classes.index(self.darknet.aliases[value])
                 #     print ' darknet.aliases', key, value, self.darknet.aliases[value]
@@ -246,7 +246,7 @@ class Imagenet(object):
                 list_file.close()
 
             print_class_counts(self.name, self.class_counts[comp], mapper=self.aliases)
-            print 'subcat counts: ', self.subcatcounts
+            print('subcat counts: ', self.subcatcounts)
 
     def old_code(self):
         dirs = set()
@@ -279,16 +279,16 @@ class Imagenet(object):
         synset_names = IO.load_txt(self.synset_words_file, col_delim='\t')
         synset_names_dict = {synset: name for synset, name in synset_names}
         for synset, name in self.synset_names_dict.iteritems():
-            print synset
-            print name
-            print synset_names_dict[synset]
+            print(synset)
+            print(name)
+            print(synset_names_dict[synset])
         names_list = []
         for parent, child in synset_is_a:
             if child not in synset_names_dict:
-                print child
+                print(child)
                 continue
             if parent not in synset_names_dict:
-                print parent
+                print(parent)
                 continue
             names_list.append((synset_names_dict[parent], synset_names_dict[child]))
         IO.dump_pkl(os.path.join(self.darknet.config['source_path'], 'parent_child_words.pkl'), sorted(names_list))
@@ -307,7 +307,7 @@ class Imagenet(object):
             tree = ET.parse(in_file)
             root = tree.getroot()
         except ET.ParseError:
-            print in_file
+            print(in_file)
             return []
 
         for obj in root.iter('object'):

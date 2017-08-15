@@ -102,12 +102,12 @@ def download_and_save_image(args_tuple):
         UC()
         return idx, True
     except Exception as e:
-        print 'Bad url or image'
-        print e
+        print('Bad url or image')
+        print(e)
         if os.path.exists(filename):
-            print 'Deleting file {}'.format(filename)
+            print('Deleting file {}...'.format(filename))
             os.remove(filename)
-            print 'done'
+            print('Deleted')
         return idx, False
 
 
@@ -171,14 +171,14 @@ def get_image_metadata(meta, curr_labels):
         temp = download_metadata(curr_labels, page=page)
 
         if isinstance(temp, str):
-            print temp
-            print 'suspending for 60 seconds...'
+            print(temp)
+            print('suspending for 60 seconds...')
             UC.sleep(60)
             break
 
         if temp['total'] == 0:
-            print "temp['total'] == 0", "curr_labels:", curr_labels, "page:", page
-            print 'suspending for 60 seconds...'
+            print("temp['total'] == 0", "curr_labels:", curr_labels, "page:", page)
+            print('suspending for 60 seconds...')
             UC.sleep(60)
             break
 
@@ -218,7 +218,7 @@ def get_image_metadata(meta, curr_labels):
     fmt_d = '{:6d} {:6d} {:6d} {:6.0f} {:6d} {:5d} {:5d}'
     display_data = [len(meta), total, len(USED_LABELS[frozenset(curr_labels)]),
                     total * PULL_PERCENTAGE, n_hits, n_updated, n_new]
-    print fmt_d.format(*display_data), frozenset(curr_labels)
+    print(fmt_d.format(*display_data), frozenset(curr_labels))
 
     return meta, temp['total']
 
@@ -322,9 +322,9 @@ if __name__ == '__main__':
 
         image_meta = {idx: meta for idx, meta in labelsdata.iteritems() if label in meta['tags']}
 
-        print ' -- Beginning:', label, '--'
+        print(' -- Beginning:', label, '--')
         fmt_h = '{:>6s} {:>6s} {:>6s} {:>6s} {:>6s} {:>5s} {:>5s}'
-        print fmt_h.format('All', 'total', 'froz', 'frac', 'hits', 'upd', 'new')
+        print(fmt_h.format('All', 'total', 'froz', 'frac', 'hits', 'upd', 'new'))
 
         image_meta = recurse_labels(image_meta, {label})
 
@@ -334,11 +334,11 @@ if __name__ == '__main__':
             if idx in labelsdata:
                 if labelsdata[idx]['width'] != record['width']:
                     if labelsdata[idx]['height'] != record['height']:
-                        print '\nIMAGE CHANGED ON PIXABAY!!!'
-                        print 'record:', idx
-                        print 'old:', labelsdata
-                        print 'new:', record
-                        print '\n'
+                        print('\nIMAGE CHANGED ON PIXABAY!!!')
+                        print('record:', idx)
+                        print('old:', labelsdata)
+                        print('new:', record)
+                        print('\n')
                         continue
 
                 # update existing tags
@@ -370,15 +370,15 @@ if __name__ == '__main__':
                 labels_updated = True
                 n_records -= 1
                 if labels_updated and n_records % 100 == 0:
-                    print "Remain: {}, Credit: {}, Timer: {}".format(n_records, UC, time.time() - start)
+                    print("Remain: {}, Credit: {}, Timer: {}".format(n_records, UC, time.time() - start))
             else:
                 UC.sleep(60)
 
         # update the labels file with the new and updated labels.
         if labels_updated:
             IO.update_files(labelsdata)
-        print 'label: {} completed'.format(label)
+        print('label: {} completed'.format(label))
 
     IO.remove_orphaned_images()
 
-    print 'done'
+    print('done')

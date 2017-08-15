@@ -86,7 +86,7 @@ class Coco(object):
                 img_ids = self.coco.getImgIds(catIds=cat_ids)
                 img_id_set = img_id_set.union(set(img_ids))
             self.img_ids = list(img_id_set)
-            print '# of images to process:', len(self.img_ids)
+            print('# of images to process:', len(self.img_ids))
 
             source_imgdir = os.path.join(self.source_dir, dataset)
             target_imgdir = os.path.join(self.darknet.images_dir, self.name, dataset)

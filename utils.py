@@ -248,13 +248,13 @@ def get_yolo_filters(classes, coords, num):
 
 
 def print_class_counts(name, class_counts, skip_zeros=False, mapper=None):
-    print '--------{}--------'.format(name)
+    print('--------{}--------'.format(name))
     for label, count in class_counts.iteritems():
         if skip_zeros and count == 0:
             continue
         lbl = mapper[label] if mapper else label
-        print '{:15s} {:10d}'.format(lbl, count)
-    print '------------------------'
+        print('{:15s} {:10d}'.format(lbl, count))
+    print('------------------------')
 
 
 def check_word(word, words_set, suffix=None):

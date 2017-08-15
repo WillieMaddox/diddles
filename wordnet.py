@@ -37,37 +37,37 @@ IO.remove_orphaned_metadata()
 dog_breeds_file = 'dog_breeds.names'
 with open(dog_breeds_file) as ifs:
     dog_breeds = set(ifs.read().strip().lower().split('\n'))
-print '{:13s}:{:10d}'.format('# dog_breeds', len(dog_breeds))
+print('{:13s}:{:10d}'.format('# dog_breeds', len(dog_breeds)))
 
 cat_breeds_file = 'cat_breeds.names'
 with open(cat_breeds_file) as ifs:
     cat_breeds = set(ifs.read().strip().lower().split('\n'))
-print '{:13s}:{:10d}'.format('# cat_breeds', len(cat_breeds))
+print('{:13s}:{:10d}'.format('# cat_breeds', len(cat_breeds)))
 
 car_makes_file = 'car_makes.names'
 with open(car_makes_file) as ifs:
     car_makes = set(ifs.read().strip().lower().split('\n'))
-print '{:13s}:{:10d}'.format('# car_makes', len(car_makes))
+print('{:13s}:{:10d}'.format('# car_makes', len(car_makes)))
 
 # *** Pixabay files ***
 
 pixabay_labels = IO.read_pixabay_metadata_file()
-print '{:13s}:{:10d}'.format('# labels', len(pixabay_labels))
+print('{:13s}:{:10d}'.format('# labels', len(pixabay_labels)))
 
 pixabay_blacklist = IO.read_pixabay_blacklist_file()
-print '{:13s}:{:10d}'.format('# blacklist', len(pixabay_blacklist))
+print('{:13s}:{:10d}'.format('# blacklist', len(pixabay_blacklist)))
 
 pixabay_aliases = IO.read_pixabay_aliases_file()
-print '{:13s}:{:10d}'.format('# aliases', len(pixabay_aliases))
+print('{:13s}:{:10d}'.format('# aliases', len(pixabay_aliases)))
 
 pixabay_tallies = IO.read_pixabay_tally_file()
-print '{:13s}:{:10d}'.format('# tallies', len(pixabay_tallies))
+print('{:13s}:{:10d}'.format('# tallies', len(pixabay_tallies)))
 
 pwords_set = set(pixabay_tallies.keys())
 c_total = len(pwords_set)
 c_tally_total = sum(pixabay_tallies.values())
 assert len(pwords_set) == len(pixabay_tallies)
-print '{:13s}:{:10d}{:10d}'.format('ptallies', c_total, c_tally_total)
+print('{:13s}:{:10d}{:10d}'.format('ptallies', c_total, c_tally_total))
 
 # *** Imagenet files ***
 
@@ -76,16 +76,16 @@ print '{:13s}:{:10d}{:10d}'.format('ptallies', c_total, c_tally_total)
 
 synset_words_dict = IO.read_synset_words_file()
 
-print '\n{:>13s}:{:>10s}{:>10s}{:>13s}'.format('', 'list', 'set', 'intersection')
+print('\n{:>13s}:{:>10s}{:>10s}{:>13s}'.format('', 'list', 'set', 'intersection'))
 swords = [s for ss in synset_words_dict.itervalues() for s in ss]
 swords_set = set(swords)
 words_set = swords_set.intersection(pwords_set)
-print '{:13s}:{:10d}{:10d}{:13d}'.format('default', len(swords), len(swords_set), len(words_set))
+print('{:13s}:{:10d}{:10d}{:13d}'.format('default', len(swords), len(swords_set), len(words_set)))
 # lowercase
 swords_lower = [s.lower() for s in swords]
 swords_lower_set = set(swords_lower)
 words_lower_set = swords_lower_set.intersection(pwords_set)
-print '{:13s}:{:10d}{:10d}{:13d}'.format('lower', len(swords_lower), len(swords_lower_set), len(words_lower_set))
+print('{:13s}:{:10d}{:10d}{:13d}'.format('lower', len(swords_lower), len(swords_lower_set), len(words_lower_set)))
 
 # *** Wordnet files ***
 
@@ -192,19 +192,19 @@ set_a = set()
 tag_counts_new = {i: 0 for i in range(max_tag_set)}
 for key, value in pixabay_labels_new.iteritems():
     if len(value['tags']) > 7:
-        print key, value
+        print(key, value)
     tag_counts_new[len(value['tags'])] += 1
     if len(value['tags']) > 0:
         set_a.update(value['tags'])
 
-print len(set_a)
+print(len(set_a))
 total_tag_counts_old = sum(tag_counts_old.values())
 total_tag_counts_new = sum(tag_counts_new.values())
 for i in range(max_tag_set):
     if tag_counts_old[i] == 0 and tag_counts_new[i] == 0:
         continue
-    print "{:3d} {:6d} {:6d} {:10.3f} {:10.3f}".format(i, tag_counts_old[i], tag_counts_new[i], 100.0*tag_counts_old[i]/total_tag_counts_old, 100.0*tag_counts_new[i]/total_tag_counts_new)
-print "All {:6d} {:6d}".format(total_tag_counts_old, total_tag_counts_new)
+    print("{:3d} {:6d} {:6d} {:10.3f} {:10.3f}".format(i, tag_counts_old[i], tag_counts_new[i], 100.0*tag_counts_old[i]/total_tag_counts_old, 100.0*tag_counts_new[i]/total_tag_counts_new))
+print("All {:6d} {:6d}".format(total_tag_counts_old, total_tag_counts_new))
 
 set_b = set()
 blacklist_new = {}
@@ -293,7 +293,7 @@ for pword, ptally in pixabay_tallies.iteritems():
     ws_cv = words_set.intersection(set(candidates.values()))
     if len(ws_cv) > 0:
         if len(ws_cv) > 1:
-            print pword, ws_cv
+            print(pword, ws_cv)
         for dkey, word in candidates.iteritems():
             if word in words_set:
                 key = 'ws' + dkey
@@ -311,7 +311,7 @@ for pword, ptally in pixabay_tallies.iteritems():
     wsl_cv = words_lower_set.intersection(set(candidates.values()))
     if len(wsl_cv) > 0:
         if len(wsl_cv) > 1:
-            print pword, wsl_cv
+            print(pword, wsl_cv)
         for dkey, word in candidates.iteritems():
             if word in words_lower_set:
                 key = 'wsl' + dkey
@@ -332,7 +332,7 @@ with open('pixabay_blacklist00.txt', 'w') as ofs:
     for bl, c in sorted(blacklist_new.items(), key=itemgetter(1), reverse=True):
         ofs.write("{}\t{}\n".format(c, bl))
 
-print set_a.symmetric_difference(set_b)
+print(set_a.symmetric_difference(set_b))
 
 c_sum = sum(counts.values())
 c_tally_sum = sum(counts_tally.values())
@@ -341,7 +341,7 @@ fmt = '{:13s}:{:10d}{:10d}{:10.3f}{:10.3f}'
 for k in key_list:
     if counts[k] == 0 and counts_tally[k] == 0:
         continue
-    print fmt.format(k, counts[k], counts_tally[k], 100.0 * counts[k] / c_total, 100.0 * counts_tally[k] / c_tally_total)
+    print(fmt.format(k, counts[k], counts_tally[k], 100.0 * counts[k] / c_total, 100.0 * counts_tally[k] / c_tally_total))
 
-print fmt.format('sum', c_sum, c_tally_sum, 100.0 * c_sum / c_total, 100.0 * c_tally_sum / c_tally_total)
+print(fmt.format('sum', c_sum, c_tally_sum, 100.0 * c_sum / c_total, 100.0 * c_tally_sum / c_tally_total))
 

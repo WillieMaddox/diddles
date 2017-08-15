@@ -277,7 +277,7 @@ class Darknet(object):
             p = Popen(command, stdout=PIPE, stderr=PIPE)
             stdout, stderr = p.communicate()
             if len(stderr) != 0:
-                print stderr
+                print(stderr)
                 break
 
             train_filename = test_file.replace('test', 'trainval')
@@ -292,7 +292,7 @@ class Darknet(object):
         p = Popen(command, stdout=PIPE, stderr=PIPE)
         stdout, stderr = p.communicate()
         if len(stderr) != 0:
-            print stderr
+            print(stderr)
             return
         with open(self.train_filename, 'w') as ofs:
             ofs.write(stdout)
@@ -304,7 +304,7 @@ class Darknet(object):
         p = Popen(command, stdout=PIPE, stderr=PIPE)
         stdout, stderr = p.communicate()
         if len(stderr) != 0:
-            print stderr
+            print(stderr)
             return
         with open(self.valid_filename, 'w') as ofs:
             ofs.write(stdout)
@@ -316,7 +316,7 @@ class Darknet(object):
         p = Popen(command, stdout=PIPE, stderr=PIPE)
         stdout, stderr = p.communicate()
         if len(stderr) != 0:
-            print stderr
+            print(stderr)
             return
         with open(self.test_filename, 'w') as ofs:
             ofs.write(stdout)
@@ -338,7 +338,7 @@ class Darknet(object):
         t0 = time.time()
         self.synset_labels_dict = {s: l for s, l in zip(slabels, swords1)}
         self.synset_label_dict = {s: l[0] for s, l in zip(slabels, swords1)}
-        print time.time() - t0
+        print(time.time() - t0)
 
         t0 = time.time()
         self.label_synsets_dict = {}
@@ -356,7 +356,7 @@ class Darknet(object):
                         ss.append('n'+s)
                 assert len(ss) > 0
                 self.label_synsets_dict[data[0]] = ss
-        print time.time() - t0
+        print(time.time() - t0)
 
     def create_word_graph(self):
         wordnet_DAG_file = "/media/SSD5/DATA/ILSVRC/wordnet.is_a.txt"
@@ -397,7 +397,7 @@ class Darknet(object):
                 for alias in aliases:
                     if alias in labels:
                         ancestors = self.get_DAG_ordered_ancestors(synset, [])
-                        print cls, alias, synset, len(ancestors)
+                        print(cls, alias, synset, len(ancestors))
                         # s = s.union(nx.ancestors(self.DAG, synset))
                         # print alias, synset, len(nx.ancestors(self.DAG, synset))
                         # camap[(cls, alias, synset)] = ancestors
@@ -520,9 +520,9 @@ if __name__ == '__main__':
         elif ds == 'Bagram':
             bagram = Bagram(darknet)
             bagram.create_darknet_dataset()
-        print ds, 'complete'
+        print(ds, 'complete')
 
     darknet.create_cross_validation_datasets()
     # darknet.merge_datasets()
 
-    print 'done'
+    print('done')

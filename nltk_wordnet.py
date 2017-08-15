@@ -50,7 +50,7 @@ IO.remove_orphaned_metadata()
 dog_breeds_file = 'dog_breeds.names'
 with open(dog_breeds_file) as ifs:
     dog_breeds = set(ifs.read().strip().lower().split('\n'))
-print '{:13s}:{:10d}'.format('# dog_breeds', len(dog_breeds))
+print('{:13s}:{:10d}'.format('# dog_breeds', len(dog_breeds)))
 
 hypo = lambda s: s.hyponyms()
 
@@ -79,14 +79,14 @@ for breed_str in sorted(dog_breeds):
         # print j, b
 
 for j, syn in enumerate(sorted(syn_words)):
-    print j, syn.name()
+    print(j, syn.name())
 
-print i, j
+print(i, j)
 
 cat_breeds_file = 'cat_breeds.names'
 with open(cat_breeds_file) as ifs:
     cat_breeds = set(ifs.read().strip().lower().split('\n'))
-print '{:13s}:{:10d}'.format('# cat_breeds', len(cat_breeds))
+print('{:13s}:{:10d}'.format('# cat_breeds', len(cat_breeds)))
 
 syn0 = wn.synset('feline.n.01')
 syn_words = list(syn0.closure(hypo))
@@ -113,34 +113,34 @@ for breed_str in sorted(cat_breeds):
         # print j, b
 
 for j, syn in enumerate(sorted(syn_words)):
-    print j, syn.name()
+    print(j, syn.name())
 
-print i, j
+print(i, j)
 
 car_makes_file = 'car_makes.names'
 with open(car_makes_file) as ifs:
     car_makes = set(ifs.read().strip().lower().split('\n'))
-print '{:13s}:{:10d}'.format('# car_makes', len(car_makes))
+print('{:13s}:{:10d}'.format('# car_makes', len(car_makes)))
 
 # *** Pixabay files ***
 
 pixabay_labels = IO.read_pixabay_metadata_file()
-print '{:13s}:{:10d}'.format('# labels', len(pixabay_labels))
+print('{:13s}:{:10d}'.format('# labels', len(pixabay_labels)))
 
 pixabay_blacklist = IO.read_pixabay_blacklist_file()
-print '{:13s}:{:10d}'.format('# blacklist', len(pixabay_blacklist))
+print('{:13s}:{:10d}'.format('# blacklist', len(pixabay_blacklist)))
 
 pixabay_aliases = IO.read_pixabay_aliases_file()
-print '{:13s}:{:10d}'.format('# aliases', len(pixabay_aliases))
+print('{:13s}:{:10d}'.format('# aliases', len(pixabay_aliases)))
 
 pixabay_tallies = IO.read_pixabay_tally_file()
-print '{:13s}:{:10d}'.format('# tallies', len(pixabay_tallies))
+print('{:13s}:{:10d}'.format('# tallies', len(pixabay_tallies)))
 
 pwords_set = set(pixabay_tallies.keys())
 c_total = len(pwords_set)
 c_tally_total = sum(pixabay_tallies.values())
 assert len(pwords_set) == len(pixabay_tallies)
-print '{:13s}:{:10d}{:10d}'.format('ptallies', c_total, c_tally_total)
+print('{:13s}:{:10d}{:10d}'.format('ptallies', c_total, c_tally_total))
 
 replacer = SpellingReplacer()
 stemmerporter = PorterStemmer()
@@ -276,16 +276,16 @@ for key, metadata in pixabay_labels.iteritems():
 
 synset_words_dict = IO.read_synset_words_file()
 
-print '\n{:>13s}:{:>10s}{:>10s}{:>13s}'.format('', 'list', 'set', 'intersection')
+print('\n{:>13s}:{:>10s}{:>10s}{:>13s}'.format('', 'list', 'set', 'intersection'))
 swords = [s for ss in synset_words_dict.itervalues() for s in ss]
 swords_set = set(swords)
 words_set = swords_set.intersection(pwords_set)
-print '{:13s}:{:10d}{:10d}{:13d}'.format('default', len(swords), len(swords_set), len(words_set))
+print('{:13s}:{:10d}{:10d}{:13d}'.format('default', len(swords), len(swords_set), len(words_set)))
 # lowercase
 swords_lower = [s.lower() for s in swords]
 swords_lower_set = set(swords_lower)
 words_lower_set = swords_lower_set.intersection(pwords_set)
-print '{:13s}:{:10d}{:10d}{:13d}\n\n'.format('lower', len(swords_lower), len(swords_lower_set), len(words_lower_set))
+print('{:13s}:{:10d}{:10d}{:13d}\n\n'.format('lower', len(swords_lower), len(swords_lower_set), len(words_lower_set)))
 
 # *** Wordnet files ***
 
@@ -391,13 +391,13 @@ for value in pixabay_labels.itervalues():
 tag_counts_newA = {i: 0 for i in range(max_tag_set)}
 for key, value in pixabay_labels_newA.iteritems():
     if len(value['tags']) > 8:
-        print key, value
+        print(key, value)
     tag_counts_newA[len(value['tags'])] += 1
 
 tag_counts_new = {i: 0 for i in range(max_tag_set)}
 for key, value in pixabay_labels_new.iteritems():
     if len(value['tags']) > 6:
-        print key, value
+        print(key, value)
     tag_counts_new[len(value['tags'])] += 1
     # if len(value['tags']) > 0:
     #     set_a.update(value['tags'])
@@ -412,8 +412,8 @@ for i in range(max_tag_set):
     tag_per_old = 100.0 * tag_counts_old[i] / total_tag_counts_old
     tag_per_newA = 100.0 * tag_counts_newA[i] / total_tag_counts_newA
     tag_per_new = 100.0 * tag_counts_new[i] / total_tag_counts_new
-    print "{:3d} {:6d} {:6d} {:6d} {:10.3f} {:10.3f} {:10.3f}".format(i, tag_counts_old[i], tag_counts_newA[i], tag_counts_new[i], tag_per_old, tag_per_newA, tag_per_new)
-print "All {:6d} {:6d} {:6d}".format(total_tag_counts_old, total_tag_counts_newA, total_tag_counts_new)
+    print("{:3d} {:6d} {:6d} {:6d} {:10.3f} {:10.3f} {:10.3f}".format(i, tag_counts_old[i], tag_counts_newA[i], tag_counts_new[i], tag_per_old, tag_per_newA, tag_per_new))
+print("All {:6d} {:6d} {:6d}".format(total_tag_counts_old, total_tag_counts_newA, total_tag_counts_new))
 
 
 # dPWL = enchant.DictWithPWL('en_US', 'synonyms.yaml')
@@ -556,11 +556,11 @@ fmt = '{:13s}:{:10d}{:10d}{:10.3f}{:10.3f}'
 for k in key_list:
     if counts[k] == 0 and counts_tally[k] == 0:
         continue
-    print fmt.format(k, counts[k], counts_tally[k], 100.0 * counts[k] / c_total, 100.0 * counts_tally[k] / c_tally_total)
-print fmt.format('sum', c_sum, c_tally_sum, 100.0 * c_sum / c_total, 100.0 * c_tally_sum / c_tally_total)
+    print(fmt.format(k, counts[k], counts_tally[k], 100.0 * counts[k] / c_total, 100.0 * counts_tally[k] / c_tally_total))
+print(fmt.format('sum', c_sum, c_tally_sum, 100.0 * c_sum / c_total, 100.0 * c_tally_sum / c_tally_total))
 
 
-print '\n'
+print('\n')
 
 
 set_b = set()
@@ -698,7 +698,7 @@ with open('pixabay_blacklist00.txt', 'w') as ofs:
 # print set_a.symmetric_difference(set_b)
 
 for pword in list(set_a.difference(set_b)):
-    print pword, pixabay_tallies[pword]
+    print(pword, pixabay_tallies[pword])
 
 c_sum = sum(counts.values())
 c_tally_sum = sum(counts_tally.values())
@@ -707,8 +707,8 @@ fmt = '{:13s}:{:10d}{:10d}{:10.3f}{:10.3f}'
 for k in key_list:
     if counts[k] == 0 and counts_tally[k] == 0:
         continue
-    print fmt.format(k, counts[k], counts_tally[k], 100.0 * counts[k] / c_total, 100.0 * counts_tally[k] / c_tally_total)
-print fmt.format('sum', c_sum, c_tally_sum, 100.0 * c_sum / c_total, 100.0 * c_tally_sum / c_tally_total)
+    print(fmt.format(k, counts[k], counts_tally[k], 100.0 * counts[k] / c_total, 100.0 * counts_tally[k] / c_tally_total))
+print(fmt.format('sum', c_sum, c_tally_sum, 100.0 * c_sum / c_total, 100.0 * c_tally_sum / c_tally_total))
 
-print '\n'
+print('\n')
 

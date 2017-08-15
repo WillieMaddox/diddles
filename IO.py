@@ -88,7 +88,7 @@ def read_wordnet_index_file(part_of_speech, output=None):
 
 def read_wordnet_exc_file(part_of_speech, output=None, verbose=False):
     if verbose:
-        print part_of_speech
+        print(part_of_speech)
     filename = os.path.join(wordnet_source_dir, part_of_speech + ".exc")
     with open(filename) as ifs:
         lines = ifs.read().strip().split('\n')
@@ -101,7 +101,7 @@ def read_wordnet_exc_file(part_of_speech, output=None, verbose=False):
         # output2 = set()
         for word_list in word_list2:
             if verbose and len(word_list) > 2:
-                print word_list
+                print(word_list)
             for w in word_list:
                 output.add(w.replace('_', ' '))
             # for i, w in enumerate(word_list):
@@ -186,7 +186,7 @@ def remove_orphaned_images():
         target_file = pixabay_orphans_dir + orphaned_file
         shutil.move(source_file, target_file)
 
-    print '{} images orphaned'.format(len(orphaned_files))
+    print('{} images orphaned'.format(len(orphaned_files)))
     return
 
 
@@ -219,7 +219,7 @@ def remove_orphaned_metadata():
     write_pixabay_orphans_file(orphans)
     write_pixabay_metadata_file(metadata)
 
-    print '{} records orphaned'.format(len(orphaned_keys))
+    print('{} records orphaned'.format(len(orphaned_keys)))
     return
 
 
@@ -240,10 +240,10 @@ def update_files(metadata):
     write_pixabay_metadata_file(metadata)
     remove_orphaned_metadata()
     metadata = read_pixabay_metadata_file()
-    print 'metadata file saved. {} total records'.format(len(metadata))
+    print('metadata file saved. {} total records'.format(len(metadata)))
     label_counts = utils.get_counts(metadata)
     write_pixabay_tally_file(label_counts)
-    print 'tally file saved. {} unique labels.'.format(len(label_counts))
+    print('tally file saved. {} unique labels.'.format(len(label_counts)))
 
 
 def convert_png_to_jpg():
