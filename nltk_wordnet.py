@@ -186,7 +186,7 @@ n_hits = 2
 
 pixabay_labels_newA = {}
 flagged_words = set()
-for key, metadata in pixabay_labels.iteritems():
+for key, metadata in pixabay_labels.items():
     metadata_new = {}
     labels_new = set()
     pwords_uni = set([safe_unicode(pword) for pword in metadata['tags']])
@@ -277,7 +277,7 @@ for key, metadata in pixabay_labels.iteritems():
 synset_words_dict = IO.read_synset_words_file()
 
 print('\n{:>13s}:{:>10s}{:>10s}{:>13s}'.format('', 'list', 'set', 'intersection'))
-swords = [s for ss in synset_words_dict.itervalues() for s in ss]
+swords = [s for ss in synset_words_dict.values() for s in ss]
 swords_set = set(swords)
 words_set = swords_set.intersection(pwords_set)
 print('{:13s}:{:10d}{:10d}{:13d}'.format('default', len(swords), len(swords_set), len(words_set)))
@@ -300,7 +300,7 @@ wordnet_adj = IO.read_wordnet_exc_file("adj", output=wordnet_adj)
 
 # ii = 0
 pixabay_labels_new = {}
-for key, metadata in pixabay_labels.iteritems():
+for key, metadata in pixabay_labels.items():
     metadata_new = {}
     labels_new = metadata['tags']
     # if 'pelikan' in labels_new:
@@ -380,22 +380,22 @@ for key, metadata in pixabay_labels.iteritems():
 
 # print 'found:', ii
 max_tag_set = 0
-for value in pixabay_labels.itervalues():
+for value in pixabay_labels.values():
     max_tag_set = max(max_tag_set, len(value['tags']))
 max_tag_set += 1
 
 tag_counts_old = {i: 0 for i in range(max_tag_set)}
-for value in pixabay_labels.itervalues():
+for value in pixabay_labels.values():
     tag_counts_old[len(value['tags'])] += 1
 
 tag_counts_newA = {i: 0 for i in range(max_tag_set)}
-for key, value in pixabay_labels_newA.iteritems():
+for key, value in pixabay_labels_newA.items():
     if len(value['tags']) > 8:
         print(key, value)
     tag_counts_newA[len(value['tags'])] += 1
 
 tag_counts_new = {i: 0 for i in range(max_tag_set)}
-for key, value in pixabay_labels_new.iteritems():
+for key, value in pixabay_labels_new.items():
     if len(value['tags']) > 6:
         print(key, value)
     tag_counts_new[len(value['tags'])] += 1
@@ -452,7 +452,7 @@ key_list = ['0', 'dogs', 'cats', 'cars', 'nouns', 'verbs', 'adv', 'adj']
 counts = {key: 0 for key in key_list}
 counts_tally = {key: 0 for key in key_list}
 
-for pword, ptally in pixabay_tallies.iteritems():
+for pword, ptally in pixabay_tallies.items():
     key = '0'
 
     if ptally <= n_hits:
@@ -573,7 +573,7 @@ print_delims = {' ': '_', '-': '-'}
 delims = [(' ', '', '_1'), (' ', '-', '_2'), ('-', ' ', '_3'), ('-', '', '_4')]
 suffi = [('s', ''), ('es', ''), ('ies', 'y'), ('ing', ''), ('ed', '')]
 
-for pword, ptally in pixabay_tallies.iteritems():
+for pword, ptally in pixabay_tallies.items():
     key = '0'
 
     # if pword == "coca-cola":
@@ -656,7 +656,7 @@ for pword, ptally in pixabay_tallies.iteritems():
     if len(ws_cv) > 0:
         # if len(ws_cv) > 1:
         #     print 'ws', pword, ws_cv, ptally
-        for dkey, word in candidates.iteritems():
+        for dkey, word in candidates.items():
             if word in words_set:
                 key = 'ws' + dkey
 
@@ -674,7 +674,7 @@ for pword, ptally in pixabay_tallies.iteritems():
     if len(wsl_cv) > 0:
         # if len(wsl_cv) > 1:
         #     print 'wsl', pword, wsl_cv, ptally
-        for dkey, word in candidates.iteritems():
+        for dkey, word in candidates.items():
             if word in words_lower_set:
                 key = 'wsl' + dkey
 

@@ -210,7 +210,7 @@ class Darknet(object):
                 classes_dict[cls].append(ii)
 
             test_dict = {i + 1: [] for i in range(n_splits)}
-            for cls_img_files in classes_dict.itervalues():
+            for cls_img_files in classes_dict.values():
                 n_test = len(cls_img_files) / n_splits
                 i_files = n_test
                 n_split = 1
@@ -255,7 +255,7 @@ class Darknet(object):
         #         test_dict[n_split].append(img_file)
 
         test_files = []
-        for n_split, image_list in test_dict.iteritems():
+        for n_split, image_list in test_dict.items():
             np.random.shuffle(image_list)
             test_file = 'test' + str(n_split) + '.list'
             with open(os.path.join(self.target_path, test_file), 'w') as ofs:
@@ -378,14 +378,14 @@ class Darknet(object):
     def create_synset_aliases(self):
         t0 = time.time()
         self.create_word_graph()
-        aliases_set = set([s for ss in self.aliases.itervalues() for s in ss])
+        aliases_set = set([s for ss in self.aliases.values() for s in ss])
 
         ofs = open('class_alias_ancestors.txt', 'w')
 
         # camap = {}
-        for cls, aliases in self.aliases.iteritems():
+        for cls, aliases in self.aliases.items():
             class_alias_ancestors = {}
-            for synset, labels in self.synset_labels_dict.iteritems():
+            for synset, labels in self.synset_labels_dict.items():
                 if synset in class_alias_ancestors:
                     continue
                 if not self.DAG.has_node(synset):
@@ -404,7 +404,7 @@ class Darknet(object):
                         class_alias_ancestors[synset] = ancestors[::-1]
 
             ofs.write(cls+'\n\n')
-            for synset, ancestors in class_alias_ancestors.iteritems():
+            for synset, ancestors in class_alias_ancestors.items():
                 ofs.write(', '.join([synset] + self.synset_labels_dict[synset]) + '\n')
                 for ancestor in ancestors:
                     ofs.write(', '.join([ancestor] + self.synset_labels_dict[ancestor]) + '\n')

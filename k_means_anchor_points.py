@@ -124,7 +124,7 @@ def load_fgvc_dataset():
             image_id, size = line.split(' ', 1)
             sizes[image_id] = map(int, size.split())
 
-    for key in bboxes.iterkeys():
+    for key in bboxes.keys():
         size = sizes[key]
         bbox = bboxes[key]
         bb = BoundingBox(size, bbox, 'fgvc').convert_to('darknet')
@@ -177,7 +177,7 @@ def load_coco_dataset():
         base_classes = {cat['id']: cat['name'] for cat in cats}
         img_id_set = set()
 
-        for cat_ids in base_classes.iterkeys():
+        for cat_ids in base_classes.keys():
             img_ids = coco.getImgIds(catIds=cat_ids)
             img_id_set = img_id_set.union(set(img_ids))
         image_ids = list(img_id_set)

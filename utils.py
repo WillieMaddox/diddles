@@ -39,7 +39,7 @@ def decode_list(data):
 
 def decode_dict(data):
     rv = {}
-    for key, value in data.iteritems():
+    for key, value in data.items():
         if isinstance(key, unicode):
             key = key.encode('utf-8')
         if isinstance(value, unicode):
@@ -249,7 +249,7 @@ def get_yolo_filters(classes, coords, num):
 
 def print_class_counts(name, class_counts, skip_zeros=False, mapper=None):
     print('--------{}--------'.format(name))
-    for label, count in class_counts.iteritems():
+    for label, count in class_counts.items():
         if skip_zeros and count == 0:
             continue
         lbl = mapper[label] if mapper else label
@@ -275,7 +275,7 @@ def check_word(word, words_set, suffix=None):
 
 def get_counts(md):
     lc = {}
-    for record in md.itervalues():
+    for record in md.values():
         for tag in record['tags']:
             if tag not in lc:
                 lc[tag] = 0
@@ -285,9 +285,9 @@ def get_counts(md):
 
 def simplify_json(meta_old, keys_to_keep):
     meta_new = {}
-    for name, record_old in meta_old.iteritems():
+    for name, record_old in meta_old.items():
         record_new = {}
-        for key, value in record_old.iteritems():
+        for key, value in record_old.items():
             if key in keys_to_keep:
                 record_new[key] = value
         meta_new[name] = record_new
@@ -296,7 +296,7 @@ def simplify_json(meta_old, keys_to_keep):
 
 def extract_tags(meta_old):
     meta_new = {}
-    for idx, record_old in meta_old.iteritems():
+    for idx, record_old in meta_old.items():
         meta_new[int(idx)] = record_old['tags']
     return meta_new
 

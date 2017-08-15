@@ -67,7 +67,7 @@ def read_synset_words_file():
 
 def get_whitelist_words():
     synset_words_dict = read_synset_words_file()
-    return set([s for ss in synset_words_dict.itervalues() for s in ss])
+    return set([s for ss in synset_words_dict.values() for s in ss])
 
 
 def read_wordnet_index_file(part_of_speech, output=None):
@@ -141,7 +141,7 @@ def read_pixabay_tally_file(hit_limit=0):
     tallies = [line.split('\t') for line in lines]
     tallies = {utils.safe_unicode(label): int(tally) for tally, label in tallies}
     if hit_limit > 0:
-        tallies = {label: tally for label, tally in tallies.iteritems() if tally > hit_limit}
+        tallies = {label: tally for label, tally in tallies.items() if tally > hit_limit}
     return tallies
 
 
@@ -206,7 +206,7 @@ def remove_orphaned_metadata():
         del orphans[dup]
 
     orphaned_keys = []
-    for key, meta in metadata.iteritems():
+    for key, meta in metadata.items():
         filename = "{}/{}.{}".format(pixabay_image_dir, key, "jpg")
         if not os.path.exists(filename):
             orphaned_keys.append(key)
@@ -229,7 +229,7 @@ def merge_orphaned_metadata():
 
     if len(orphans) == 0:
         return
-    for key, orphan in orphans.iteritems():
+    for key, orphan in orphans.items():
         metadata[key] = orphan
 
     os.remove(pixabay_source_dir + 'orphans.pkl')

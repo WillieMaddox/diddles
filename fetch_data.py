@@ -77,7 +77,7 @@ def download_metadata(labels, page=1, per_page=PER_PAGE):
              # 'order': 'latest',
              'per_page': str(per_page),
              'page': str(page)}
-    query_list = ['='.join([k, v]) for k, v in query.iteritems()]
+    query_list = ['='.join([k, v]) for k, v in query.items()]
     query_string = '&'.join(query_list)
     url = '?'.join([base_url, query_string])
     response = requests.get(url, headers={'content-type': 'application/json'})
@@ -148,7 +148,7 @@ def filter_labels(old_tags):
 
 def update_used_labels(curr_labels, image_ids):
 
-    for used_label_group, old_image_ids in USED_LABELS.iteritems():
+    for used_label_group, old_image_ids in USED_LABELS.items():
         if used_label_group.issubset(curr_labels):
             USED_LABELS[used_label_group].update(image_ids)
         # if used_label_group.issuperset(curr_labels):
@@ -235,7 +235,7 @@ def get_new_label_set(new_image_metadata, curr_labels):
         new_labels = curr_labels.union([label_name])
 
         dup_set_found = False
-        for used_label_group, image_ids in USED_LABELS.iteritems():
+        for used_label_group, image_ids in USED_LABELS.items():
             if len(used_label_group.symmetric_difference(new_labels)) == 0:
                 dup_set_found = True
                 break
@@ -248,14 +248,14 @@ def get_new_label_set(new_image_metadata, curr_labels):
 
 def create_image_metadata_subset(curr_metadata, curr_labels):
     new_image_metadata = {}
-    for idx, meta in curr_metadata.iteritems():
+    for idx, meta in curr_metadata.items():
         if curr_labels.issubset(meta['tags']):
             new_image_metadata[idx] = meta
     return new_image_metadata
 
 
 def merge_image_metadata_sets(current_metadata, future_metadata):
-    for idx, meta in future_metadata.iteritems():
+    for idx, meta in future_metadata.items():
         current_metadata[idx] = meta
     return current_metadata
 
@@ -320,7 +320,7 @@ if __name__ == '__main__':
 
     for label in labels:
 
-        image_meta = {idx: meta for idx, meta in labelsdata.iteritems() if label in meta['tags']}
+        image_meta = {idx: meta for idx, meta in labelsdata.items() if label in meta['tags']}
 
         print(' -- Beginning:', label, '--')
         fmt_h = '{:>6s} {:>6s} {:>6s} {:>6s} {:>6s} {:>5s} {:>5s}'
@@ -330,7 +330,7 @@ if __name__ == '__main__':
 
         url_filename_list = []
         labels_updated = False
-        for idx, record in image_meta.iteritems():
+        for idx, record in image_meta.items():
             if idx in labelsdata:
                 if labelsdata[idx]['width'] != record['width']:
                     if labelsdata[idx]['height'] != record['height']:
