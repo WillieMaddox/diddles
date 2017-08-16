@@ -60,7 +60,7 @@ def read_synset_words_file():
     with open(filename) as ifs:
         lines = ifs.read().strip().split('\n')
     synset_words = [line.split('\t') for line in lines]
-    synsets, word_strings = zip(*synset_words)
+    synsets, word_strings = list(zip(*synset_words))
     word_lists = [[w.strip() for w in ws.split(',')] for ws in word_strings]
     synset_words_dict = {synset: word_list for synset, word_list in zip(synsets, word_lists)}
     return synset_words_dict

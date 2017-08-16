@@ -330,7 +330,7 @@ class Darknet(object):
             synsets = ifs.read().strip().split('\n')
 
         synsets = [line.split('\t') for line in synsets]
-        slabels, swords = zip(*synsets)
+        slabels, swords = list(zip(*synsets))
         sword_lists = [w.split(',') for w in swords]
 
         swords1 = [[s.strip() for s in ss] for ss in sword_lists]

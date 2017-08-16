@@ -116,13 +116,13 @@ def load_fgvc_dataset():
         lines = ifs.read().strip().split('\n')
         for line in lines:
             image_id, bbox = line.split(' ', 1)
-            bboxes[image_id] = map(int, bbox.split())
+            bboxes[image_id] = list(map(int, bbox.split()))
 
     with open(source_imgdir + '_size.txt') as ifs:
         lines = ifs.read().strip().split('\n')
         for line in lines:
             image_id, size = line.split(' ', 1)
-            sizes[image_id] = map(int, size.split())
+            sizes[image_id] = list(map(int, size.split()))
 
     for key in bboxes.keys():
         size = sizes[key]
