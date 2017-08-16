@@ -103,7 +103,7 @@ class SpellingReplacer(object):
 class CustomSpellingReplacer(SpellingReplacer):
     """ SpellingReplacer that allows passing a custom enchant dictionary, such
     a DictWithPWL.
-    >>> d = enchant.DictWithPWL('en_US', 'mywords.txt')
+    >>> d = enchant.DictWithPWL('en_US', 'data/mywords.txt')
     >>> replacer = CustomSpellingReplacer(d)
     >>> replacer.replace('nltk')
     'nltk'
@@ -156,7 +156,7 @@ class CsvWordReplacer(WordReplacer):
 
 class YamlWordReplacer(WordReplacer):
     """ WordReplacer that reads word mappings from a yaml file.
-    >>> replacer = YamlWordReplacer('synonyms.yaml')
+    >>> replacer = YamlWordReplacer('data/synonyms.yaml')
     >>> replacer.replace('bday')
     'birthday'
     >>> replacer.replace('happy')

@@ -47,7 +47,7 @@ IO.remove_orphaned_metadata()
 
 # *** Custom words ***
 
-dog_breeds_file = 'dog_breeds.names'
+dog_breeds_file = 'data/dog_breeds.names'
 with open(dog_breeds_file) as ifs:
     dog_breeds = set(ifs.read().strip().lower().split('\n'))
 print('{:13s}:{:10d}'.format('# dog_breeds', len(dog_breeds)))
@@ -83,7 +83,7 @@ for j, syn in enumerate(sorted(syn_words)):
 
 print(i, j)
 
-cat_breeds_file = 'cat_breeds.names'
+cat_breeds_file = 'data/cat_breeds.names'
 with open(cat_breeds_file) as ifs:
     cat_breeds = set(ifs.read().strip().lower().split('\n'))
 print('{:13s}:{:10d}'.format('# cat_breeds', len(cat_breeds)))
@@ -117,7 +117,7 @@ for j, syn in enumerate(sorted(syn_words)):
 
 print(i, j)
 
-car_makes_file = 'car_makes.names'
+car_makes_file = 'data/car_makes.names'
 with open(car_makes_file) as ifs:
     car_makes = set(ifs.read().strip().lower().split('\n'))
 print('{:13s}:{:10d}'.format('# car_makes', len(car_makes)))
@@ -146,7 +146,7 @@ replacer = SpellingReplacer()
 stemmerporter = PorterStemmer()
 stemmerlan = LancasterStemmer()
 lemmatizer = WordNetLemmatizer()
-yamlreplacer = YamlWordReplacer('synonyms.yaml')
+yamlreplacer = YamlWordReplacer('data/synonyms.yaml')
 
 # good0 = 0
 # fixed0 = 0
@@ -545,7 +545,7 @@ for pword, ptally in pixabay_tallies.items():
         blacklist_new[pword] = ptally
 
 
-with open('pixabay_blacklist01.txt', 'w') as ofs:
+with open('data/pixabay_blacklist01.txt', 'w') as ofs:
     for bl, c in sorted(blacklist_new.items(), key=itemgetter(1), reverse=True):
         ofs.write("{}\t{}\n".format(c, bl))
 
@@ -691,7 +691,7 @@ for pword, ptally in pixabay_tallies.items():
         blacklist_new[pword] = ptally
 
 
-with open('pixabay_blacklist00.txt', 'w') as ofs:
+with open('data/pixabay_blacklist00.txt', 'w') as ofs:
     for bl, c in sorted(blacklist_new.items(), key=itemgetter(1), reverse=True):
         ofs.write("{}\t{}\n".format(c, bl))
 
