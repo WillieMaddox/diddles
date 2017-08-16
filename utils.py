@@ -8,11 +8,11 @@ def to_bytestring(s, enc='utf-8'):
 def safe_unicode(obj, *args):
     """ return the unicode representation of obj """
     try:
-        return unicode(obj, *args)
+        return str(obj, *args)
     except UnicodeDecodeError:
         # obj is byte string
         ascii_text = str(obj).encode('string_escape')
-        return unicode(ascii_text)
+        return str(ascii_text)
 
 
 def safe_bytestring(obj):
@@ -21,13 +21,13 @@ def safe_bytestring(obj):
         return str(obj)
     except UnicodeEncodeError:
         # obj is unicode
-        return unicode(obj).encode('unicode_escape')
+        return str(obj).encode('unicode_escape')
 
 
 def decode_list(data):
     rv = []
     for item in data:
-        if isinstance(item, unicode):
+        if isinstance(item, str):
             item = item.encode('utf-8')
         elif isinstance(item, list):
             item = decode_list(item)
@@ -40,9 +40,9 @@ def decode_list(data):
 def decode_dict(data):
     rv = {}
     for key, value in data.items():
-        if isinstance(key, unicode):
+        if isinstance(key, str):
             key = key.encode('utf-8')
-        if isinstance(value, unicode):
+        if isinstance(value, str):
             value = value.encode('utf-8')
         elif isinstance(value, list):
             value = decode_list(value)

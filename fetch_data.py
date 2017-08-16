@@ -5,17 +5,12 @@ Caffe ImagesDataLayer training file.
 """
 import os
 import time
-import json
-import urllib
+import urllib.request, urllib.parse, urllib.error
 import requests
 from PIL import Image
 from operator import itemgetter
 from skimage import io
 from multiprocessing.pool import ThreadPool
-try:
-    import cPickle as pickle
-except ImportError:
-    import pickle as pickle
 import utils
 import IO
 from api_keys import PIXABAY_API_KEY
@@ -58,11 +53,6 @@ class UserCredit(object):
 UC = UserCredit()
 
 
-def read_json(response):
-    json_data0 = json.loads(response, 'utf-8')
-    return utils.decode_dict(json_data0)
-
-
 def download_metadata(labels, page=1, per_page=PER_PAGE):
     """
 
@@ -82,7 +72,7 @@ def download_metadata(labels, page=1, per_page=PER_PAGE):
     url = '?'.join([base_url, query_string])
     response = requests.get(url, headers={'content-type': 'application/json'})
     UC()
-    return read_json(response.content) if response.status_code == 200 else response.content
+    return response.json() if response.status_code == 200 else response.content
 
 
 def download_and_save_image(args_tuple):
@@ -90,12 +80,12 @@ def download_and_save_image(args_tuple):
     try:
         if filename.endswith('.jpg'):
             if not os.path.exists(filename):
-                urllib.urlretrieve(url, filename)
+                urllib.request.urlretrieve(url, filename)
                 _ = io.imread(filename)
         elif filename.endswith('.png'):
             new_filename = ''.join([filename[:-3], 'jpg'])
             if not os.path.exists(new_filename):
-                urllib.urlretrieve(url, filename)
+                urllib.request.urlretrieve(url, filename)
                 im = Image.open(filename)
                 im.save(new_filename, "JPEG")
                 os.remove(filename)
@@ -105,7 +95,7 @@ def download_and_save_image(args_tuple):
         print('Bad url or image')
         print(e)
         if os.path.exists(filename):
-            print('Deleting file {}...'.format(filename))
+            print('Deleting file {}...'.format(filename), end=' ')
             os.remove(filename)
             print('Deleted')
         return idx, False
@@ -205,9 +195,9 @@ def get_image_metadata(meta, curr_labels):
                 continue
 
             meta[record['id']] = {'tags': new_tags,
-                                            'height': record['webformatHeight'],
-                                            'width': record['webformatWidth'],
-                                            'webformatURL': record['webformatURL']}
+                                  'height': record['webformatHeight'],
+                                  'width': record['webformatWidth'],
+                                  'webformatURL': record['webformatURL']}
 
         if temp['totalHits'] <= page * PER_PAGE:
             break

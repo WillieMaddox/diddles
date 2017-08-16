@@ -3,7 +3,8 @@ import IO
 from utils import safe_unicode
 import enchant
 import unicodedata
-
+import nltk
+nltk.data.path.append("/media/Borg_LS/DATA/nltk_data")
 from nltk.corpus import wordnet as wn
 from nltk.stem import PorterStemmer
 from nltk.stem import RegexpStemmer

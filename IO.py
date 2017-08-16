@@ -4,10 +4,7 @@ import shutil
 from operator import itemgetter
 from PIL import Image
 import networkx as nx
-try:
-    import cPickle as pickle
-except ImportError:
-    import pickle as pickle
+import pickle
 import utils
 
 # data_source_dir = "/media/Borg_LS/DATA"
