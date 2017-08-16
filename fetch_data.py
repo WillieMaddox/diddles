@@ -138,7 +138,7 @@ def filter_labels(old_tags):
 
 def update_used_labels(curr_labels, image_ids):
 
-    for used_label_group, old_image_ids in USED_LABELS.items():
+    for used_label_group, old_image_ids in iter(USED_LABELS.items()):
         if used_label_group.issubset(curr_labels):
             USED_LABELS[used_label_group].update(image_ids)
         # if used_label_group.issuperset(curr_labels):
@@ -225,7 +225,7 @@ def get_new_label_set(new_image_metadata, curr_labels):
         new_labels = curr_labels.union([label_name])
 
         dup_set_found = False
-        for used_label_group, image_ids in USED_LABELS.items():
+        for used_label_group, image_ids in iter(USED_LABELS.items()):
             if len(used_label_group.symmetric_difference(new_labels)) == 0:
                 dup_set_found = True
                 break
@@ -238,14 +238,14 @@ def get_new_label_set(new_image_metadata, curr_labels):
 
 def create_image_metadata_subset(curr_metadata, curr_labels):
     new_image_metadata = {}
-    for idx, meta in curr_metadata.items():
+    for idx, meta in iter(curr_metadata.items()):
         if curr_labels.issubset(meta['tags']):
             new_image_metadata[idx] = meta
     return new_image_metadata
 
 
 def merge_image_metadata_sets(current_metadata, future_metadata):
-    for idx, meta in future_metadata.items():
+    for idx, meta in iter(future_metadata.items()):
         current_metadata[idx] = meta
     return current_metadata
 
@@ -298,7 +298,7 @@ if __name__ == '__main__':
     labelsdata = IO.read_pixabay_metadata_file()
 
     # new_labelsdata = {}
-    # for idx, meta in labelsdata.iteritems():
+    # for idx, meta in iter(labelsdata.items()):
     #     new_labelsdata[idx] = {}
     #     new_tags = filter_labels(meta['tags'])
     #     new_labelsdata[idx]['tags'] = new_tags
@@ -320,7 +320,7 @@ if __name__ == '__main__':
 
         url_filename_list = []
         labels_updated = False
-        for idx, record in image_meta.items():
+        for idx, record in iter(image_meta.items()):
             if idx in labelsdata:
                 if labelsdata[idx]['width'] != record['width']:
                     if labelsdata[idx]['height'] != record['height']:

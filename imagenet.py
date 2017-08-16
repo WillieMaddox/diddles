@@ -91,14 +91,14 @@ class Imagenet(object):
             return {}
 
         classes = {}
-        for comp, classes_file in self.classes_files.items():
+        for comp, classes_file in iter(self.classes_files.items()):
             comp_classes = {}
             with open(classes_file) as ifs:
                 classes_temp = ifs.read().strip().split('\n')
             base_classes = [kls.split() for kls in classes_temp]
             base_classes = {k: v for k, _, v in base_classes}
 
-            for key, value in base_classes.items():
+            for key, value in iter(base_classes.items()):
                 # if value in self.darknet.classes:
                 #     comp_classes[key] = self.darknet.classes.index(value)
                 #     print ' darknet.classes', key, value
@@ -111,7 +111,7 @@ class Imagenet(object):
                 #     comp_classes[key] = self.darknet.classes.index(self.darknet.aliases[value])
                 #     print ' darknet.aliases', key, value, self.darknet.aliases[value]
 
-            for label in comp_classes.keys():
+            for label in iter(comp_classes.keys()):
                 self.class_counts[comp][label] = 0
 
             classes[comp] = comp_classes
@@ -192,9 +192,9 @@ class Imagenet(object):
 
     def create_darknet_dataset(self):
         darknet_data_dir = os.path.join(self.darknet.images_dir, self.name)
-        for comp, image_sets in self.sets.items():
+        for comp, image_sets in iter(self.sets.items()):
             classes = self.classes[comp]
-            for image_set, image_subsets in image_sets.items():
+            for image_set, image_subsets in iter(image_sets.items()):
 
                 if comp in self.blacklist and image_set in self.blacklist[comp]:
                     blacklist_filename = self.blacklist[comp][image_set]
@@ -343,7 +343,7 @@ class Imagenet(object):
         IO.dump_pkl(out_filename, synset_subcategory_dict)
 
         names_subcategory_dict = {}
-        for synset_name, synset_subcategories in synset_subcategory_dict.items():
+        for synset_name, synset_subcategories in iter(synset_subcategory_dict.items()):
             subcategory_list = []
             for synset_subcategory in synset_subcategories:
                 subcategory_list.append(self.synset_names_dict[synset_subcategory])

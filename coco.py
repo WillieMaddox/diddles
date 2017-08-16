@@ -81,7 +81,7 @@ class Coco(object):
             self.coco = COCO(annfile)
             self.classes = self.load_classes()
             img_id_set = set()
-            for cat_ids in self.classes.iterkeys():
+            for cat_ids in iter(self.classes.keys()):
                 # cat_ids = self.coco.getCatIds(catNms=[kls])
                 img_ids = self.coco.getImgIds(catIds=cat_ids)
                 img_id_set = img_id_set.union(set(img_ids))

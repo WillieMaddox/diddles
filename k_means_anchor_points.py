@@ -177,7 +177,7 @@ def load_coco_dataset():
         base_classes = {cat['id']: cat['name'] for cat in cats}
         img_id_set = set()
 
-        for cat_ids in base_classes.keys():
+        for cat_ids in iter(base_classes.keys()):
             img_ids = coco.getImgIds(catIds=cat_ids)
             img_id_set = img_id_set.union(set(img_ids))
         image_ids = list(img_id_set)

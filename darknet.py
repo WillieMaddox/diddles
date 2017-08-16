@@ -210,7 +210,7 @@ class Darknet(object):
                 classes_dict[cls].append(ii)
 
             test_dict = {i + 1: [] for i in range(n_splits)}
-            for cls_img_files in classes_dict.values():
+            for cls_img_files in iter(classes_dict.values()):
                 n_test = len(cls_img_files) / n_splits
                 i_files = n_test
                 n_split = 1
@@ -244,7 +244,7 @@ class Darknet(object):
         #         raise
 
         # test_dict = {i + 1: [] for i in range(n_splits)}
-        # for cls_img_files in classes_dict.itervalues():
+        # for cls_img_files in iter(classes_dict.values()):
         #     n_test = len(cls_img_files) / n_splits
         #     i_files = n_test
         #     n_split = 1
@@ -255,7 +255,7 @@ class Darknet(object):
         #         test_dict[n_split].append(img_file)
 
         test_files = []
-        for n_split, image_list in test_dict.items():
+        for n_split, image_list in iter(test_dict.items()):
             np.random.shuffle(image_list)
             test_file = 'test' + str(n_split) + '.list'
             with open(os.path.join(self.target_path, test_file), 'w') as ofs:
@@ -383,9 +383,9 @@ class Darknet(object):
         ofs = open('class_alias_ancestors.txt', 'w')
 
         # camap = {}
-        for cls, aliases in self.aliases.items():
+        for cls, aliases in iter(self.aliases.items()):
             class_alias_ancestors = {}
-            for synset, labels in self.synset_labels_dict.items():
+            for synset, labels in iter(self.synset_labels_dict.items()):
                 if synset in class_alias_ancestors:
                     continue
                 if not self.DAG.has_node(synset):
@@ -404,17 +404,17 @@ class Darknet(object):
                         class_alias_ancestors[synset] = ancestors[::-1]
 
             ofs.write(cls+'\n\n')
-            for synset, ancestors in class_alias_ancestors.items():
+            for synset, ancestors in iter(class_alias_ancestors.items()):
                 ofs.write(', '.join([synset] + self.synset_labels_dict[synset]) + '\n')
                 for ancestor in ancestors:
                     ofs.write(', '.join([ancestor] + self.synset_labels_dict[ancestor]) + '\n')
                 ofs.write('\n')
 
         ofs.close()
-        # for cls, aliases in self.aliases.iteritems():
+        # for cls, aliases in iter(self.aliases.items()):
         #     for alias in aliases:
         #     class_alias_sets[cls]
-        # for label, synsets in self.label_synsets_dict.iteritems():
+        # for label, synsets in iter(self.label_synsets_dict.items()):
         #     if label in self.classes:
         #         for synset in synsets:
         #             if self.DG.has_node(synset):

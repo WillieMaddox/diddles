@@ -100,7 +100,7 @@ wordnet_adj = IO.read_wordnet_exc_file("adj", output=wordnet_adj)
 
 # ii = 0
 pixabay_labels_new = {}
-for key, metadata in pixabay_labels.items():
+for key, metadata in iter(pixabay_labels.items()):
     metadata_new = {}
     labels_new = metadata['tags']
     # if 'pelikan' in labels_new:
@@ -133,7 +133,7 @@ for key, metadata in pixabay_labels.items():
     if len(labels_new) > 0:
         labels_new = labels_new.difference(car_makes)
 
-    for _, alias_list in pixabay_aliases.items():
+    for _, alias_list in iter(pixabay_aliases.items()):
         if len(labels_new) > 0:
             labels_new = labels_new.difference(alias_list)
 
@@ -216,7 +216,7 @@ print_delims = {' ': '_', '-': '-'}
 delims = [(' ', '', '_1'), (' ', '-', '_2'), ('-', ' ', '_3'), ('-', '', '_4')]
 suffi = [('s', ''), ('es', ''), ('ies', 'y'), ('ing', ''), ('ed', '')]
 
-for pword, ptally in pixabay_tallies.items():
+for pword, ptally in iter(pixabay_tallies.items()):
     key = '0'
 
     # if pword == "coca-cola":
@@ -253,7 +253,7 @@ for pword, ptally in pixabay_tallies.items():
         key = 'wsl'
 
     else:
-        for _, alias_list in pixabay_aliases.items():
+        for _, alias_list in iter(pixabay_aliases.items()):
             if pword in alias_list:
                 key = 'alias'
                 break
@@ -294,7 +294,7 @@ for pword, ptally in pixabay_tallies.items():
     if len(ws_cv) > 0:
         if len(ws_cv) > 1:
             print(pword, ws_cv)
-        for dkey, word in candidates.items():
+        for dkey, word in iter(candidates.items()):
             if word in words_set:
                 key = 'ws' + dkey
 
@@ -312,7 +312,7 @@ for pword, ptally in pixabay_tallies.items():
     if len(wsl_cv) > 0:
         if len(wsl_cv) > 1:
             print(pword, wsl_cv)
-        for dkey, word in candidates.items():
+        for dkey, word in iter(candidates.items()):
             if word in words_lower_set:
                 key = 'wsl' + dkey
 

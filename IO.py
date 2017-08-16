@@ -215,7 +215,7 @@ def remove_orphaned_metadata():
         del orphans[dup]
 
     orphaned_keys = []
-    for key, meta in metadata.items():
+    for key, meta in iter(metadata.items()):
         filename = "{}/{}.{}".format(pixabay_image_dir, key, "jpg")
         if not os.path.exists(filename):
             orphaned_keys.append(key)
@@ -238,7 +238,7 @@ def merge_orphaned_metadata():
 
     if len(orphans) == 0:
         return
-    for key, orphan in orphans.items():
+    for key, orphan in iter(orphans.items()):
         metadata[key] = orphan
 
     os.remove(pixabay_source_dir + 'orphans.pkl')
