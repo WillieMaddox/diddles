@@ -3,7 +3,7 @@ import chardet
 
 
 def detect(s):
-    '''
+    """
     >>> detect('ascii')
     {'confidence': 1.0, 'encoding': 'ascii'}
     >>> detect('abcdé')
@@ -12,7 +12,7 @@ def detect(s):
     {'confidence': 0.505, 'encoding': 'utf-8'}
     >>> detect(bytes('\222\222\223\225', 'latin-1'))
     {'confidence': 0.5, 'encoding': 'windows-1252'}
-    '''
+    """
     try:
         if isinstance(s, str):
             return chardet.detect(s.encode())
@@ -23,7 +23,7 @@ def detect(s):
 
 
 def convert(s):
-    '''
+    """
     >>> convert('ascii')
     'ascii'
     >>> convert('abcdé')
@@ -32,7 +32,7 @@ def convert(s):
     'abcdé'
     >>> convert(bytes('\222\222\223\225', 'latin-1'))
     '\u2019\u2019\u201c\u2022'
-    '''
+    """
     if isinstance(s, str):
         s = s.encode()
 
