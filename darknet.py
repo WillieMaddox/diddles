@@ -178,7 +178,6 @@ class Darknet(object):
 
     def create_cross_validation_datasets(self):
         # Make cross-validation data files.
-        import numpy as np
 
         n_splits = 5
 
