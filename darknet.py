@@ -174,7 +174,7 @@ class Darknet(object):
             elif dataset.lower() in ('bagram',):
                 self.datasets.append('Bagram')
             else:
-                raise
+                raise ValueError('unknown dataset')
 
     def create_cross_validation_datasets(self):
         # Make cross-validation data files.
