@@ -1,0 +1,17 @@
+binoculars
+headphones
+sunglasses
+eyeglasses
+glasses
+scissors
+tweezers
+clothes
+jeans
+pyjamas
+tights
+knickers
+shorts
+trousers
+pants
+bleachers
+alps
