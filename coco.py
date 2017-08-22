@@ -91,7 +91,7 @@ class Coco(object):
             source_imgdir = os.path.join(self.source_dir, dataset)
             target_imgdir = os.path.join(self.darknet.images_dir, self.name, dataset)
             target_lbldir = os.path.join(self.darknet.labels_dir, self.name, dataset)
-            list_file = open('%s/%s_%s.list' % (self.darknet.temp_train_dir, self.name, dataset), 'w')
+            list_file = open(f'{self.darknet.temp_train_dir}/{self.name}_{dataset}.list', 'w')
             for image_id in self.img_ids:
 
                 img = self.coco.loadImgs(image_id)[0]

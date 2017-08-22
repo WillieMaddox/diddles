@@ -338,7 +338,7 @@ class Pixabay(object):
     def create_darknet_dataset(self):
 
         target_imgdir = os.path.join(self.darknet.images_dir, self.name)
-        list_file = open('%s/%s.list' % (self.darknet.temp_train_dir, self.name), 'w')
+        list_file = open(f'{self.darknet.temp_train_dir}/{self.name}.list', 'w')
 
         for dirpath, _, xml_filenames in os.walk(self.ano_dir):
             for xml_fname in xml_filenames:

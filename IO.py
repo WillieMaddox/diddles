@@ -147,7 +147,7 @@ def write_pixabay_tally_file(label_counts):
     tally_file = os.path.join(pixabay_source_dir, 'tally.txt')
     with open(tally_file, 'w') as ofs:
         for label0, counts in sorted(label_counts.items(), key=itemgetter(1), reverse=True):
-            ofs.write("{}\t{}\n".format(counts, label0))
+            ofs.write(f"{counts}\t{label0}\n")
 
 
 # def read_pixabay_aliases_file(dual=False):
@@ -195,7 +195,7 @@ def remove_orphaned_images():
         target_file = os.path.join(pixabay_orphans_dir, orphaned_file)
         shutil.move(source_file, target_file)
 
-    print('{} images orphaned'.format(len(orphaned_files)))
+    print(f'{len(orphaned_files)} images orphaned')
     return
 
 
@@ -216,7 +216,7 @@ def remove_orphaned_metadata():
 
     orphaned_keys = []
     for key, meta in iter(metadata.items()):
-        filename = "{}/{}.{}".format(pixabay_image_dir, key, "jpg")
+        filename = f"{pixabay_image_dir}/{key}.{'jpg'}"
         if not os.path.exists(filename):
             orphaned_keys.append(key)
 
@@ -228,7 +228,7 @@ def remove_orphaned_metadata():
     write_pixabay_orphans_file(orphans)
     write_pixabay_metadata_file(metadata)
 
-    print('{} records orphaned'.format(len(orphaned_keys)))
+    print(f'{len(orphaned_keys)} records orphaned')
     return
 
 
@@ -249,10 +249,10 @@ def update_files(metadata):
     write_pixabay_metadata_file(metadata)
     remove_orphaned_metadata()
     metadata = read_pixabay_metadata_file()
-    print('metadata file saved. {} total records'.format(len(metadata)))
+    print(f'metadata file saved. {len(metadata)} total records')
     label_counts = utils.get_counts(metadata)
     write_pixabay_tally_file(label_counts)
-    print('tally file saved. {} unique labels.'.format(len(label_counts)))
+    print(f'tally file saved. {len(label_counts)} unique labels.')
 
 
 def convert_png_to_jpg():

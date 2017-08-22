@@ -55,7 +55,7 @@ class FGVC(object):
         # bb = convert_bbox(size, bbox)
         bb = BoundingBox(size, bbox, 'fgvc').convert_to('darknet')
 
-        # out_filename = '%s/%s/%s.txt' % (self.darknet.labels_dir, self.name, image_id)
+        # out_filename = f'{self.darknet.labels_dir}/{self.name}/{image_id}.txt'
         if not os.path.exists(out_filename.rpartition(os.sep)[0]):
             os.makedirs(out_filename.rpartition(os.sep)[0])
 
@@ -84,8 +84,8 @@ class FGVC(object):
                 self.sizes[image_id] = map(int, size.split())
 
         for image_set in self.sets:
-            set_fname = '%s_%s_%s.txt' % (source_imgdir, self.level, image_set)
-            links_fname = '%s/%s_%s.list' % (self.darknet.temp_train_dir, self.name, image_set)
+            set_fname = f'{source_imgdir}_{self.level}_{image_set}.txt'
+            links_fname = f'{self.darknet.temp_train_dir}/{self.name}_{image_set}.list'
             lines = open(set_fname).read().strip().split('\n')
             list_file = open(links_fname, 'w')
             for line in lines:

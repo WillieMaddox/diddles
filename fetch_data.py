@@ -43,7 +43,7 @@ class UserCredit(object):
         self.timestamps.append(now)
 
     def __str__(self):
-        return "{}".format(self.max_credit - len(self.timestamps))
+        return f"{self.max_credit - len(self.timestamps)}"
 
     @staticmethod
     def sleep(n):
@@ -95,7 +95,7 @@ def download_and_save_image(args_tuple):
         print('Bad url or image')
         print(e)
         if os.path.exists(filename):
-            print('Deleting file {}...'.format(filename), end=' ')
+            print(f'Deleting file {filename}...', end=' ')
             os.remove(filename)
             print('Deleted')
         return idx, False
@@ -205,10 +205,12 @@ def get_image_metadata(meta, curr_labels):
     update_used_labels(curr_labels, image_ids)
 
     # print out some logging info.
-    fmt_d = '{:6d} {:6d} {:6d} {:6.0f} {:6d} {:5d} {:5d}'
-    display_data = [len(meta), total, len(USED_LABELS[frozenset(curr_labels)]),
-                    total * PULL_PERCENTAGE, n_hits, n_updated, n_new]
-    print(fmt_d.format(*display_data), frozenset(curr_labels))
+    print(f'{len(meta):7d} '
+          f'{total:6d} '
+          f'{total * PULL_PERCENTAGE:6.0f} '
+          f'{n_hits:6d} '
+          f'{n_updated:5d} '
+          f'{n_new:5d}', frozenset(curr_labels))
 
     return meta, temp['total']
 
@@ -313,8 +315,12 @@ if __name__ == '__main__':
         image_meta = {idx: meta for idx, meta in labelsdata.items() if label in meta['tags']}
 
         print(' -- Beginning:', label, '--')
-        fmt_h = '{:>6s} {:>6s} {:>6s} {:>6s} {:>6s} {:>5s} {:>5s}'
-        print(fmt_h.format('All', 'total', 'froz', 'frac', 'hits', 'upd', 'new'))
+        print(f'{"Current":>7s} '
+              f'{"total":>6s} '
+              f'{"frac":>6s} '
+              f'{"hits":>6s} '
+              f'{"upd":>5s} '
+              f'{"new":>5s}')
 
         image_meta = recurse_labels(image_meta, {label})
 
@@ -325,9 +331,9 @@ if __name__ == '__main__':
                 if labelsdata[idx]['width'] != record['width']:
                     if labelsdata[idx]['height'] != record['height']:
                         print('\nIMAGE CHANGED ON PIXABAY!!!')
-                        print('record:', idx)
-                        print('old:', labelsdata)
-                        print('new:', record)
+                        print(f'record: {idx}')
+                        print(f'old: {labelsdata}')
+                        print(f'new: {record}')
                         print('\n')
                         continue
 
@@ -343,12 +349,13 @@ if __name__ == '__main__':
                 # Create the list of image files to download
                 url = record['webformatURL']
                 filetype = url.split('.')[-1]
-                filename = "{}/{}.{}".format(IO.pixabay_image_dir, idx, filetype)
+                filename = f"{IO.pixabay_image_dir}/{idx}.{filetype}"
                 url_filename_list.append((idx, url, filename))
 
         # download new images in parallel
         start = time.time()
         n_records = len(url_filename_list)
+        print(f"Remain: {n_records}, Credit: {UC}, Timer: {time.time() - start}")
         # don't set pooling too high.  remember you can only download 5000 images per hour.
         results = ThreadPool(2).imap_unordered(download_and_save_image, url_filename_list)
         for idx, result in results:
@@ -360,14 +367,14 @@ if __name__ == '__main__':
                 labels_updated = True
                 n_records -= 1
                 if labels_updated and n_records % 100 == 0:
-                    print("Remain: {}, Credit: {}, Timer: {}".format(n_records, UC, time.time() - start))
+                    print(f"Remain: {n_records}, Credit: {UC}, Timer: {time.time() - start}")
             else:
                 UC.sleep(60)
 
         # update the labels file with the new and updated labels.
         if labels_updated:
             IO.update_files(labelsdata)
-        print('label: {} completed'.format(label))
+        print(f'label: {label} completed')
 
     IO.remove_orphaned_images()
 

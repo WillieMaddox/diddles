@@ -44,9 +44,9 @@ def kmeans_iou(k, centroids, points, iter_count=0, iteration_cutoff=25, feature_
             best_clusters = clusters
             best_avg_iou_iteration = iter_count
 
-        print("\nIteration {}".format(iter_count))
-        print("Average iou to closest centroid = {}".format(avg_iou))
-        print("Sum of all distances (cost) = {}".format(np.sum(clusters_niou)))
+        print(f"\nIteration {iter_count}")
+        print(f"Average iou to closest centroid = {avg_iou}")
+        print(f"Sum of all distances (cost) = {np.sum(clusters_niou)}")
 
         new_centroids = np.array([np.mean(c, axis=0) for c in clusters])
         isect = np.prod(np.min(np.asarray([centroids, new_centroids]), axis=0), axis=1)
@@ -66,9 +66,9 @@ def kmeans_iou(k, centroids, points, iter_count=0, iteration_cutoff=25, feature_
     # Get anchor boxes from best clusters
     anchors = np.asarray([np.mean(cluster, axis=0) for cluster in best_clusters])
     anchors = anchors[anchors[:, 0].argsort()]
-    print("k-means clustering pascal anchor points (original coordinates) \
-    \nFound at iteration {} with best average IoU: {} \
-    \n{}".format(best_avg_iou_iteration, best_avg_iou, anchors*feature_size))
+    print(f"k-means clustering pascal anchor points (original coordinates) \
+    \nFound at iteration {best_avg_iou_iteration} with best average IoU: {best_avg_iou} \
+    \n{anchors*feature_size}")
 
     return anchors
 
@@ -138,12 +138,12 @@ def load_pascal_dataset():
     data = []
 
     for year, image_set in datasets:
-        img_ids_filename = '%s/%s/VOCdevkit/VOC%s/ImageSets/Main/%s.txt' % (source_dir, name, year, image_set)
+        img_ids_filename = f'{source_dir}/{name}/VOCdevkit/VOC{year}/ImageSets/Main/{image_set}.txt'
         ifs_img_ids = open(img_ids_filename)
         img_ids = ifs_img_ids.read().strip().split()
 
         for image_id in img_ids:
-            anno_filename = '%s/%s/VOCdevkit/VOC%s/Annotations/%s.xml' % (source_dir, name, year, image_id)
+            anno_filename = f'{source_dir}/{name}/VOCdevkit/VOC{year}/Annotations/{image_id}.xml'
             ifs_anno = open(anno_filename)
             tree = ET.parse(ifs_anno)
             root = tree.getroot()
@@ -171,7 +171,7 @@ def load_coco_dataset():
     data = []
 
     for dataset in datasets:
-        annfile = '%s/%s/annotations/instances_%s.json' % (source_dir, name, dataset)
+        annfile = f'{source_dir}/{name}/annotations/instances_{dataset}.json'
         coco = COCO(annfile)
         cats = coco.loadCats(coco.getCatIds())
         base_classes = {cat['id']: cat['name'] for cat in cats}

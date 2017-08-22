@@ -78,7 +78,7 @@ class Pascal(object):
     def create_darknet_dataset(self):
 
         for year, image_set in self.sets:
-            year_id = 'VOC%s' % (year,)
+            year_id = f'VOC{year}'
             source_idsdir = os.path.join(self.source_dir, year_id, 'ImageSets', 'Main')
             source_imgdir = os.path.join(self.source_dir, year_id, 'JPEGImages')
             source_lbldir = os.path.join(self.source_dir, year_id, 'Annotations')
@@ -86,7 +86,7 @@ class Pascal(object):
             target_lbldir = os.path.join(self.darknet.labels_dir, self.name, year_id)
             ids_filename = os.path.join(source_idsdir, image_set + '.txt')
             image_ids = open(ids_filename).read().strip().split()
-            list_file = open('%s/%s_%s%s.list' % (self.darknet.temp_train_dir, self.name, year, image_set), 'w')
+            list_file = open(f'{self.darknet.temp_train_dir}/{self.name}_{year}{image_set}.list', 'w')
 
             for image_id in image_ids:
                 src_img_filename = os.path.join(source_imgdir, image_id + '.jpg')
