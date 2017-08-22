@@ -139,10 +139,10 @@ assert len(pwords_set) == len(pixabay_tallies)
 print(f'{"ptallies":13s}:{c_total:10d}{c_tally_total:10d}')
 
 replacer = SpellingReplacer()
-stemmerporter = PorterStemmer()
-stemmerlan = LancasterStemmer()
-lemmatizer = WordNetLemmatizer()
 yamlreplacer = YamlWordReplacer('data/synonyms.yaml')
+stemmerPorter = PorterStemmer()
+stemmerLancsr = LancasterStemmer()
+wnLemmatizer = WordNetLemmatizer()
 
 # good0 = 0
 # fixed0 = 0
@@ -502,18 +502,58 @@ for pword, ptally in iter(pixabay_tallies.items()):
             if key != '0':
                 break
 
+    if key == 'noun*':
+        csyn_words = wn.synsets(cword, pos=wn.NOUN)
+        found = False
+
+        # porter_word = stemmerPorter.stem(cword)
+        # if porter_word != cword:
+        #     psyn_words = wn.synsets(porter_word, pos=wn.NOUN)
+        #     if len(psyn_words) > 0:
+        #         for csyn_word in csyn_words:
+        #             for psyn_word in psyn_words:
+        #                 pdist = csyn_word.wup_similarity(psyn_word)
+        #                 if pdist >= 0.1:
+        #                     found = True
+        #                     print('porter', pdist, cword, csyn_word.name(), porter_word, psyn_word.name())
+        #
+        # lancsr_word = stemmerLancsr.stem(cword)
+        # if lancsr_word != cword:
+        #     lsyn_words = wn.synsets(lancsr_word, pos=wn.NOUN)
+        #     if len(lsyn_words) > 0:
+        #         for csyn_word in csyn_words:
+        #             for lsyn_word in lsyn_words:
+        #                 ldist = csyn_word.wup_similarity(lsyn_word)
+        #                 if ldist >= 0.1:
+        #                     found = True
+        #                     print('lancsr', ldist, cword, csyn_word.name(), lancsr_word, lsyn_word.name())
+
+        lemmat_word = wnLemmatizer.lemmatize(cword)
+        if lemmat_word != cword:
+            syn_words = wn.synsets(lemmat_word, pos=wn.NOUN)
+            if len(syn_words) > 0:
+                for csyn_word in csyn_words:
+                    for syn_word in syn_words:
+                        dist = csyn_word.wup_similarity(syn_word)
+                        if dist >= 0.9:
+                            found = True
+                            print('lemmat', dist, cword, csyn_word.name(), lemmat_word, syn_word.name())
+
+        if found:
+            print('')
+
     # if key == '0' and '_' in cword:
     #     wds = cword.split('_')
     #     join_key = str(len(wds))
     #     # key = 'multi'+str(len(wds))
     #     for joiner in ['-', '']:
     #         rword = cword.replace('_', joiner)
-    #         sword = stemmerporter.stem(rword)
+    #         sword = stemmerPorter.stem(rword)
     #         key = get_pos_key(sword)
     #         if key != '0':
     #             print '0', key, rword, sword, ptally
     #             break
-    #         sword = stemmerlan.stem(rword)
+    #         sword = stemmerLancsr.stem(rword)
     #         key = get_pos_key(sword)
     #         if key != '0':
     #             print '1', key, rword, sword, ptally
@@ -525,12 +565,12 @@ for pword, ptally in iter(pixabay_tallies.items()):
     #     # key = 'multi'+str(len(wds))
     #     for joiner in ['_', '']:
     #         rword = cword.replace('-', joiner)
-    #         sword = stemmerporter.stem(rword)
+    #         sword = stemmerPorter.stem(rword)
     #         key = get_pos_key(sword)
     #         if key != '0':
     #             print '2', key, rword, sword, ptally
     #             break
-    #         sword = stemmerlan.stem(rword)
+    #         sword = stemmerLancsr.stem(rword)
     #         key = get_pos_key(sword)
     #         if key != '0':
     #             print '3', key, rword, sword, ptally
