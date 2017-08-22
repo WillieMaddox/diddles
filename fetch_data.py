@@ -235,6 +235,9 @@ def get_new_label_set(new_image_metadata, curr_labels):
 
         new_labels = curr_labels.union([label_name])
 
+        if len('+'.join(new_labels)) > 100:
+            # pixabay api rule
+            continue
         dup_set_found = False
         for used_label_group, image_ids in iter(USED_LABELS.items()):
             if len(used_label_group.symmetric_difference(new_labels)) == 0:
