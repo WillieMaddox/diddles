@@ -124,6 +124,7 @@ class BBoxDim(object):
             self._cen = val
             self.update()
 
+    # thick corresponds to height or width depending on dimension.
     @property
     def thick(self):
         return self._thick
@@ -140,7 +141,7 @@ class BoundingBox(object):
     """
     size is a 2 element list
     bbox is a dictionary
-    fmt is the format of the bbox. (i.e. voc, coco, fgvc, darknet
+    fmt is the format of the bbox. (i.e. voc, coco, fgvc, darknet, ...)
     """
     def __init__(self, size, bbox, fmt):
         self.fmt = fmt
