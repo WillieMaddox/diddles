@@ -10,7 +10,7 @@ from imagenet import Imagenet
 from pascal import Pascal
 from coco import Coco
 from pixabay import Pixabay
-from bagram import Bagram
+# from bagram import Bagram
 from fgvc_aircraft import FGVC
 
 

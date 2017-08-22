@@ -1,4 +1,8 @@
-import re, csv, yaml, enchant
+import csv
+import enchant
+import re
+import yaml
+
 from nltk.corpus import wordnet
 from nltk.metrics import edit_distance
 

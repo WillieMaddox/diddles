@@ -5,14 +5,18 @@ Caffe ImagesDataLayer training file.
 """
 import os
 import time
-import urllib.request, urllib.parse, urllib.error
+import urllib.error
+import urllib.parse
+import urllib.request
+from multiprocessing.pool import ThreadPool
+from operator import itemgetter
+
 import requests
 from PIL import Image
-from operator import itemgetter
 from skimage import io
-from multiprocessing.pool import ThreadPool
-import utils
+
 import IO
+import utils
 from api_keys import PIXABAY_API_KEY
 
 PER_PAGE = 200
