@@ -459,7 +459,7 @@ def get_pos_key(word, posttag=''):
 set_a = set()
 dict_a = {}
 blacklist_new = {}
-key_list = ['0', 'dogs', 'cats', 'cars', 'nouns', 'verbs', 'adv', 'adj']
+key_list = ['0', 'dogs', 'cats', 'cars', 'noun', 'verb', 'adv', 'adj']
 counts = {key: 0 for key in key_list}
 counts_tally = {key: 0 for key in key_list}
 
