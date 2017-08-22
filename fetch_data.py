@@ -112,7 +112,8 @@ def filter_labels(old_tags):
             tag = tag[4:]
         if tag in PIXABAY_ALIASES:
             tag = PIXABAY_ALIASES[tag]
-        if tag in BLACKLIST:
+
+        if tag in BLACKLIST or tag in BLACKLIST_LOWER:
             continue
         elif tag[-1] == 's' and tag[:-1] in BLACKLIST:
             continue
@@ -123,6 +124,9 @@ def filter_labels(old_tags):
         elif tag[-3:] == 'ies' and tag[:-3] + 'y' in BLACKLIST:
             continue
         elif tag[-3:] == 'ing' and tag[:-3] in BLACKLIST:
+            continue
+        elif tag in WHITELIST or tag in WHITELIST_LOWER:
+            new_tags.add(tag)
             continue
         elif tag[-1] == 's' and tag[:-1] in WHITELIST:
             continue
@@ -208,6 +212,7 @@ def get_image_metadata(meta, curr_labels):
 
     update_used_labels(curr_labels, image_ids)
 
+    assert len(USED_LABELS[frozenset(curr_labels)]) == n_hits
     # print out some logging info.
     print(f'{len(meta):7d} '
           f'{total:6d} '
@@ -238,6 +243,8 @@ def get_new_label_set(new_image_metadata, curr_labels):
 
         if not dup_set_found:
             break
+    else:
+        new_labels = set()
 
     return new_labels
 
