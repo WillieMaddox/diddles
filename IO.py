@@ -241,7 +241,7 @@ def merge_orphaned_metadata():
     for key, orphan in iter(orphans.items()):
         metadata[key] = orphan
 
-    os.remove(pixabay_source_dir + 'orphans.pkl')
+    os.remove(os.path.join(pixabay_source_dir, 'orphans.pkl'))
     write_pixabay_metadata_file(metadata)
 
 

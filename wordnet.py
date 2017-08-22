@@ -328,7 +328,7 @@ for pword, ptally in iter(pixabay_tallies.items()):
         blacklist_new[pword] = ptally
         set_b.add(pword)
 
-with open('pixabay_blacklist00.txt', 'w') as ofs:
+with open('data/pixabay_blacklist00.txt', 'w') as ofs:
     for bl, c in sorted(blacklist_new.items(), key=itemgetter(1), reverse=True):
         ofs.write("{}\t{}\n".format(c, bl))
 
