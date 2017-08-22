@@ -1,6 +1,5 @@
 from operator import itemgetter
 import IO
-from utils import safe_unicode
 import enchant
 import unicodedata
 import nltk
@@ -59,25 +58,23 @@ syn0 = wn.synset('dog.n.01')
 syn_words = list(syn0.closure(hypo))
 i = 0
 j = 0
-for breed_str in sorted(dog_breeds):
+for breed in sorted(dog_breeds):
     found = False
-    breed = safe_unicode(breed_str)
     b = breed.replace(' ', '_') if ' ' in breed else breed
     for syn in wn.synsets(b):
-        if found:
-            break
         for syn_path in syn.hypernym_paths():
             hyper_names = [s.name() for s in syn_path]
-            if 'dog.n.01' in hyper_names:
-                if syn in syn_words:
-                    syn_words.pop(syn_words.index(syn))
-                    found = True
-                    break
+            if 'dog.n.01' in hyper_names and syn in syn_words:
+                syn_words.pop(syn_words.index(syn))
+                found = True
+                break
+        if found:
+            break
     if found:
         i += 1
     else:
         j += 1
-        # print j, b
+        print(j, b)
 
 for j, syn in enumerate(sorted(syn_words)):
     print(j, syn.name())
@@ -93,25 +90,23 @@ syn0 = wn.synset('feline.n.01')
 syn_words = list(syn0.closure(hypo))
 i = 0
 j = 0
-for breed_str in sorted(cat_breeds):
+for breed in sorted(cat_breeds):
     found = False
-    breed = safe_unicode(breed_str)
     b = breed.replace(' ', '_') if ' ' in breed else breed
     for syn in wn.synsets(b):
-        if found:
-            break
         for syn_path in syn.hypernym_paths():
             hyper_names = [s.name() for s in syn_path]
-            if 'feline.n.01' in hyper_names:
-                if syn in syn_words:
-                    syn_words.pop(syn_words.index(syn))
-                    found = True
-                    break
+            if 'feline.n.01' in hyper_names and syn in syn_words:
+                syn_words.pop(syn_words.index(syn))
+                found = True
+                break
+        if found:
+            break
     if found:
         i += 1
     else:
         j += 1
-        # print j, b
+        print(j, b)
 
 for j, syn in enumerate(sorted(syn_words)):
     print(j, syn.name())
@@ -156,16 +151,13 @@ yamlreplacer = YamlWordReplacer('data/synonyms.yaml')
 #     if ptally <= 2:
 #         skipped += 1
 #         continue
-#     pword_uni = safe_unicode(pword)
-#     # pword_uni = unicodedata.normalize('NFKD', pword_uni).encode('ascii', 'ignore')
-#     if ' ' in pword_uni:
-#         pwords_uni = pword_uni.split()
-#     else:
-#         pwords_uni = [pword_uni]
+#     # I don't think I need this anymore.
+#     # pword = unicodedata.normalize('NFKD', pword).encode('ascii', 'ignore')
+#     pwords = pword.split() if ' ' in pword else [pword]
 #
 #     fixed = False
 #     pwords_new = []
-#     for pw in pwords_uni:
+#     for pw in pwords:
 #         pw_new = replacer.replace(pw)
 #
 #         if pw == pw_new:
@@ -190,31 +182,32 @@ flagged_words = set()
 for key, metadata in iter(pixabay_labels.items()):
     metadata_new = {}
     labels_new = set()
-    pwords_uni = set([safe_unicode(pword) for pword in metadata['tags']])
-    for pword_uni in pwords_uni:
-        if pword_uni in flagged_words:
+    if len(metadata['tags']) > 45:
+        print(key)
+        print(metadata['tags'])
+    for pword in metadata['tags']:
+        if pword in flagged_words:
             continue
-        if pixabay_tallies[pword_uni] <= n_hits:
-            flagged_words.update([pword_uni])
-            continue
-        synsets = wn.synsets(pword_uni)
-        if len(synsets) > 0:
-            flagged_words.update([pword_uni])
-            continue
-        cword_uni = pword_uni.replace(' ', '_') if ' ' in pword_uni else pword_uni
-        cword_uni = yamlreplacer.replace(cword_uni)
 
-        synsets = wn.synsets(cword_uni)
-        if len(synsets) > 0:
-            flagged_words.update([pword_uni])
+        if pixabay_tallies[pword] <= n_hits:
+            flagged_words.update([pword])
             continue
-        # pword_new = replacer.replace(pword_uni)
-        # synsets = wn.synsets(pword_new)
-        # if len(synsets) > 0:
-        #     flagged_words.update([pword_uni])
+
+        if len(wn.synsets(pword)) > 0:
+            flagged_words.update([pword])
+            continue
+
+        cword = pword.replace(' ', '_') if ' ' in pword else pword
+        # cword = yamlreplacer.replace(cword)
+        if len(wn.synsets(cword)) > 0:
+            flagged_words.update([pword])
+            continue
+        # pword_new = replacer.replace(pword)
+        # if len(wn.synsets(pword_new)) > 0:
+        #     flagged_words.update([pword])
         #     continue
 
-        labels_new.update([pword_uni])
+        labels_new.update([pword])
 
     # if len(labels_new) > 0:
     #     labels_new = labels_new.difference(pixabay_blacklist)
@@ -399,13 +392,17 @@ for key, value in iter(pixabay_labels_newA.items()):
         print(key, value)
     tag_counts_newA[len(value['tags'])] += 1
 
+set_a = set()
 tag_counts_new = {i: 0 for i in range(max_tag_set)}
 for key, value in iter(pixabay_labels_new.items()):
     if len(value['tags']) > 6:
         print(key, value)
     tag_counts_new[len(value['tags'])] += 1
-    # if len(value['tags']) > 0:
-    #     set_a.update(value['tags'])
+    if len(value['tags']) > 0:
+        set_a.update(value['tags'])
+
+print(len(set_a.difference(flagged_words)))
+print(len(flagged_words.difference(set_a)))
 
 # print len(set_a)
 total_tag_counts_old = sum(tag_counts_old.values())
@@ -712,7 +709,7 @@ with open('data/pixabay_blacklist00.txt', 'w') as ofs:
     for bl, c in sorted(blacklist_new.items(), key=itemgetter(1), reverse=True):
         ofs.write(f"{c}\t{bl}\n")
 
-# print set_a.symmetric_difference(set_b)
+# print(set_a.symmetric_difference(set_b))
 
 for pword in list(set_a.difference(set_b)):
     print(pword, pixabay_tallies[pword])
